@@ -3,325 +3,558 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>销售业务合规风险填报数据源维护</title>
+  <title>销售业务合规风险填报系统</title>
   <style>
     :root {
       --blue: #1f78ea;
-      --deep-blue: #1662d4;
-      --light-blue: #edf5ff;
-      --bg: #f4f7fb;
+      --blue-2: #0f63d6;
+      --nav: #0f2d52;
+      --nav-2: #123b6f;
+      --bg: #f3f6fb;
       --card: #ffffff;
-      --line: #e6edf5;
+      --line: #e4ebf5;
+      --line-2: #d5e0ee;
       --text: #1f2d3d;
       --muted: #748195;
-      --green: #19b67b;
+      --green: #16b47b;
       --orange: #f59a23;
       --red: #e64b4b;
-      --shadow: 0 8px 24px rgba(31, 64, 115, 0.08);
+      --purple: #7a58f5;
+      --shadow: 0 10px 28px rgba(27, 63, 116, .09);
+      --soft-blue: #edf5ff;
+      --soft-green: #eaf8f2;
+      --soft-orange: #fff4e6;
+      --soft-red: #fff0f0;
     }
 
     * { box-sizing: border-box; }
     body {
       margin: 0;
-      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      min-width: 1440px;
+      min-height: 100vh;
       background: var(--bg);
       color: var(--text);
-      min-width: 1440px;
+      font-family: "Microsoft YaHei", "PingFang SC", Arial, sans-serif;
+      overflow: hidden;
     }
 
-    .topbar {
-      height: 64px;
-      background: linear-gradient(90deg, #1f78ea 0%, #246dde 68%, #1a66d8 100%);
-      color: #fff;
+    button, input, select, textarea { font-family: inherit; }
+    button { cursor: pointer; }
+
+    .app { display: grid; grid-template-columns: 224px 1fr; height: 100vh; }
+    .sidebar {
+      background: linear-gradient(180deg, #0f2d52 0%, #102844 100%);
+      color: #dbe8ff;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 4px 0 18px rgba(15, 45, 82, .18);
+      z-index: 10;
+    }
+    .brand {
+      height: 72px;
       display: flex;
       align-items: center;
-      padding: 0 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,.12);
+      padding: 0 20px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
-    .brand { display: flex; align-items: center; width: 250px; }
     .logo {
-      width: 34px; height: 34px; border-radius: 50%; margin-right: 12px;
-      background: conic-gradient(#45d2ff, #7d6bff, #ff8d54, #f5d75d, #45d2ff);
-      box-shadow: inset 0 0 10px rgba(255,255,255,.4);
+      width: 36px; height: 36px; border-radius: 11px;
+      background: conic-gradient(from 130deg, #43d5ff, #4676ff, #9f6bff, #ff8a4c, #ffd35c, #43d5ff);
+      margin-right: 12px;
+      box-shadow: inset 0 0 10px rgba(255,255,255,.45);
     }
-    .brand-title { font-size: 24px; font-weight: 700; letter-spacing: 1px; }
-    .nav { flex: 1; display: flex; align-items: stretch; height: 64px; }
-    .nav-item {
-      min-width: 128px; padding: 0 22px; display: flex; align-items: center; justify-content: center;
-      font-size: 16px; color: rgba(255,255,255,.9); position: relative;
+    .brand-main { font-size: 18px; font-weight: 800; color: #fff; letter-spacing: .5px; }
+    .brand-sub { font-size: 12px; opacity: .68; margin-top: 2px; }
+    .menu { padding: 14px 10px; flex: 1; }
+    .menu-group { color: rgba(219,232,255,.58); font-size: 12px; padding: 14px 14px 8px; }
+    .menu-item {
+      height: 42px; border-radius: 10px; display: flex; align-items: center;
+      padding: 0 14px; margin-bottom: 6px; gap: 10px; color: rgba(219,232,255,.82);
+      font-size: 14px;
     }
-    .nav-item.active { background: #fff; color: #1563ce; font-weight: 700; }
-    .nav-item.active:before, .nav-item.active:after {
-      content:""; position: absolute; top: 0; width: 0; height: 0; border-top: 64px solid transparent;
-    }
-    .nav-item.active:before { left: -20px; border-right: 20px solid #fff; }
-    .nav-item.active:after { right: -20px; border-left: 20px solid #fff; }
-    .search {
-      width: 250px; height: 36px; border-radius: 10px; background: #fff; color: #a4adbb;
-      display: flex; align-items: center; padding: 0 14px; margin-right: 20px; font-size: 14px;
-    }
-    .icons { display:flex; gap:18px; align-items:center; font-size:20px; margin-right:18px; }
-    .avatar {
-      width: 48px; height: 48px; border-radius: 50%; background: #fff; color:#b08322;
-      display:flex; align-items:center; justify-content:center; font-size:26px; font-weight:700;
-    }
+    .menu-item.active { background: linear-gradient(90deg, #1f78ea, #1669d7); color: #fff; box-shadow: 0 8px 20px rgba(31,120,234,.25); }
+    .menu-item .ico { width: 20px; text-align: center; font-size: 16px; }
+    .sidebar-foot { padding: 14px; border-top: 1px solid rgba(255,255,255,.08); font-size: 12px; color: rgba(219,232,255,.66); line-height: 1.6; }
 
-    .tabs {
-      height: 48px; background: #fff; display: flex; align-items: center; padding: 0 20px;
-      border-bottom: 1px solid var(--line); box-shadow: 0 3px 8px rgba(31,64,115,.06);
+    .main { display: grid; grid-template-rows: 64px 1fr; min-width: 0; }
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 22px;
+      box-shadow: 0 4px 18px rgba(31, 64, 115, .05);
+      z-index: 8;
     }
-    .tab {
-      height: 32px; display:flex; align-items:center; padding: 0 14px; border-radius: 4px;
-      border: 1px solid #dbe5f0; color:#5b6778; margin-right: 8px; font-size:14px; background:#fff;
+    .breadcrumb { display: flex; align-items: center; gap: 10px; color: #536378; font-size: 14px; }
+    .breadcrumb strong { font-size: 19px; color: #1e3555; }
+    .top-actions { display: flex; align-items: center; gap: 14px; }
+    .global-search {
+      width: 260px; height: 36px; border: 1px solid var(--line-2); border-radius: 18px;
+      padding: 0 14px; color: #8b98aa; background: #f8fbff; display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px;
     }
-    .tab.active { background: var(--blue); color:#fff; border-color: var(--blue); }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; background: #f5f0e8; color: #b08322; display: flex; align-items: center; justify-content: center; font-weight: 800; }
 
-    .page { padding: 16px; }
-    .page-title-row {
-      display:flex; align-items:center; justify-content:space-between; margin-bottom: 12px;
+    .workspace { padding: 18px; overflow: auto; }
+    .hero {
+      background: linear-gradient(135deg, #1f78ea 0%, #3a8df0 52%, #62b4ff 100%);
+      border-radius: 16px;
+      color: #fff;
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 14px;
     }
-    .title-block { display:flex; flex-direction:column; gap:4px; }
-    .page-title { font-size: 22px; font-weight: 700; color:#1e3555; }
-    .page-subtitle { color:#748195; font-size:13px; }
-    .update-time { color:#40506a; font-size:14px; display:flex; align-items:center; gap:8px; }
-    .dot { width:9px; height:9px; background: var(--green); border-radius:50%; box-shadow:0 0 0 6px rgba(25,182,123,.12); }
+    .hero:after {
+      content: ""; position: absolute; right: -80px; top: -100px; width: 300px; height: 300px;
+      border-radius: 50%; background: rgba(255,255,255,.14);
+    }
+    .hero-row { display: flex; justify-content: space-between; align-items: center; position: relative; z-index: 1; }
+    .hero-title { font-size: 24px; font-weight: 800; margin-bottom: 6px; }
+    .hero-desc { opacity: .88; font-size: 13px; }
+    .hero-steps { display: flex; align-items: center; gap: 10px; }
+    .step {
+      height: 34px; padding: 0 12px; border-radius: 17px; background: rgba(255,255,255,.16);
+      display: flex; align-items: center; gap: 8px; font-size: 13px;
+    }
+    .step b { width: 20px; height: 20px; background: #fff; color: var(--blue); display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; }
 
-    .toolbar {
-      background:#fff; border-radius:10px; box-shadow: var(--shadow); padding: 14px 16px; margin-bottom: 14px;
-      display:flex; align-items:center; justify-content:space-between;
+    .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 14px; }
+    .stat-card { background: #fff; border-radius: 14px; padding: 16px; box-shadow: var(--shadow); border: 1px solid rgba(228,235,245,.8); }
+    .stat-label { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+    .stat-value { font-size: 26px; font-weight: 850; color: #1e3555; line-height: 1; }
+    .stat-note { margin-top: 8px; font-size: 12px; color: #91a0b4; }
+    .stat-card.blue .stat-value { color: var(--blue); }
+    .stat-card.green .stat-value { color: var(--green); }
+    .stat-card.orange .stat-value { color: var(--orange); }
+    .stat-card.red .stat-value { color: var(--red); }
+
+    .filter-card, .table-card { background: #fff; border-radius: 14px; box-shadow: var(--shadow); border: 1px solid rgba(228,235,245,.92); }
+    .filter-card { padding: 16px; margin-bottom: 14px; }
+    .filter-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .section-title { display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 800; color: #1e3555; }
+    .section-title:before { content: ""; width: 4px; height: 18px; border-radius: 2px; background: var(--blue); }
+    .filter-grid { display: grid; grid-template-columns: 1.1fr 1.25fr .9fr 1.15fr .9fr 1fr 170px; gap: 12px; align-items: end; }
+    .field label { display: block; margin-bottom: 7px; color: #44546d; font-weight: 700; font-size: 13px; }
+    .control, .input, .select, textarea {
+      width: 100%; height: 36px; border: 1px solid var(--line-2); border-radius: 8px; background: #fff; color: #25364c;
+      padding: 0 11px; font-size: 13px; outline: none;
     }
-    .actions { display:flex; gap:10px; }
+    textarea { height: 86px; resize: none; padding-top: 9px; line-height: 1.5; }
+    .control { display: flex; align-items: center; justify-content: space-between; }
+    .btns { display: flex; gap: 8px; }
     .btn {
-      height: 36px; border: 1px solid #d5e0ec; background:#fff; border-radius:6px; padding:0 14px;
-      color:#33445c; font-size:14px; cursor: default; display:flex; align-items:center; gap:6px;
+      height: 36px; border: 1px solid var(--line-2); border-radius: 8px; background: #fff; color: #34465f;
+      padding: 0 13px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 13px; white-space: nowrap;
     }
-    .btn.primary { background: var(--blue); color:#fff; border-color: var(--blue); box-shadow:0 4px 10px rgba(31,120,234,.22); }
-    .btn.green { background: #19b67b; color:#fff; border-color:#19b67b; }
-    .btn.orange { background: #f59a23; color:#fff; border-color:#f59a23; }
-    .btn.danger { background: #fff; color:#e64b4b; border-color:#f2caca; }
-    .btn.ghost-blue { background: var(--light-blue); color: var(--blue); border-color:#cbe0ff; }
+    .btn.primary { background: var(--blue); color: #fff; border-color: var(--blue); box-shadow: 0 5px 12px rgba(31,120,234,.22); }
+    .btn.green { background: var(--green); color: #fff; border-color: var(--green); }
+    .btn.orange { background: var(--orange); color: #fff; border-color: var(--orange); }
+    .btn.red { background: var(--red); color: #fff; border-color: var(--red); }
+    .btn.soft { background: var(--soft-blue); color: var(--blue); border-color: #cfe2ff; }
+    .btn:active { transform: translateY(1px); }
 
-    .filter-card {
-      background:#fff; border-radius:10px; box-shadow: var(--shadow); padding: 16px; margin-bottom: 14px;
+    .table-card { overflow: hidden; }
+    .tabbar { height: 52px; display: flex; align-items: center; border-bottom: 1px solid var(--line); padding: 0 16px; gap: 4px; }
+    .tab {
+      height: 52px; padding: 0 22px; display: flex; align-items: center; gap: 8px; color: #536378;
+      font-weight: 800; position: relative; user-select: none; cursor: pointer;
     }
-    .filter-grid {
-      display:grid; grid-template-columns: 1.1fr 1.25fr 1fr 1.35fr 1fr 1fr 150px; gap: 14px; align-items:end;
-    }
-    .field label { display:block; font-size:14px; color:#44546d; font-weight:700; margin-bottom:8px; }
-    .control {
-      height: 36px; border:1px solid #dbe5f0; border-radius:6px; background:#fff; padding:0 12px;
-      display:flex; align-items:center; justify-content:space-between; color:#223047; font-size:14px;
-    }
-    .control.placeholder { color:#8c98aa; }
-    .filter-actions { display:flex; gap:10px; }
+    .tab.active { color: var(--blue); }
+    .tab.active:after { content: ""; position: absolute; left: 16px; right: 16px; bottom: 0; height: 3px; border-radius: 2px 2px 0 0; background: var(--blue); }
+    .badge { border-radius: 11px; background: #e9eef6; color: #5b6b82; font-size: 12px; padding: 1px 8px; }
+    .tab.active .badge { background: var(--blue); color: #fff; }
+    .table-head { min-height: 58px; display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--line); background: linear-gradient(180deg,#fff,#fbfdff); }
+    .table-title-wrap { display: flex; flex-direction: column; gap: 4px; }
+    .table-title { font-size: 17px; font-weight: 850; color: #1e3555; }
+    .table-desc { font-size: 12px; color: var(--muted); }
+    .table-actions { display: flex; align-items: center; gap: 8px; }
+    .table-wrap { overflow: auto; max-height: 430px; }
+    table { width: 100%; min-width: 1600px; border-collapse: collapse; table-layout: fixed; }
+    th { height: 42px; background: #edf4fc; color: #32455f; text-align: left; padding: 0 10px; font-size: 13px; border-right: 1px solid #dfe8f4; position: sticky; top: 0; z-index: 1; }
+    td { height: 44px; padding: 0 10px; border-top: 1px solid #edf1f6; border-right: 1px solid #edf1f6; color: #24364d; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; background: #fff; }
+    tbody tr:hover td { background: #f8fbff; }
+    .check { width: 16px; height: 16px; accent-color: var(--blue); }
+    .tag { display: inline-flex; height: 22px; padding: 0 8px; align-items: center; border-radius: 11px; font-size: 12px; font-weight: 700; }
+    .tag.published { background: var(--soft-green); color: #079965; }
+    .tag.draft { background: var(--soft-orange); color: #b96b0c; }
+    .tag.invalid { background: var(--soft-red); color: #d03b3b; }
+    .tag.linkage { background: #f0edff; color: var(--purple); }
+    .op { color: var(--blue); font-weight: 800; margin-right: 12px; cursor: pointer; }
+    .op.red { color: var(--red); }
+    .foot { height: 46px; display: flex; justify-content: space-between; align-items: center; padding: 0 16px; color: #6f7d90; font-size: 13px; border-top: 1px solid var(--line); }
+    .pages { display: flex; align-items: center; gap: 6px; }
+    .page-no { min-width: 26px; height: 26px; border: 1px solid var(--line-2); border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; }
+    .page-no.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
-    .content { display:grid; grid-template-columns: 1fr 360px; gap:14px; align-items:start; }
-    .panel {
-      background:#fff; border-radius:10px; box-shadow: var(--shadow); overflow:hidden;
-    }
-    .panel-head {
-      height: 54px; display:flex; align-items:center; justify-content:space-between; padding:0 16px;
-      border-bottom:1px solid var(--line); background:linear-gradient(180deg,#fff,#fbfdff);
-    }
-    .panel-title { font-size:16px; font-weight:700; color:#1e3555; display:flex; align-items:center; gap:8px; }
-    .bar { width:4px; height:18px; background: var(--blue); border-radius:4px; }
-    .panel-tip { color:#7d8899; font-size:13px; }
-    .switch-tabs { display:flex; height:44px; border-bottom:1px solid var(--line); padding-left:16px; background:#fff; }
-    .switch-tab { display:flex; align-items:center; padding:0 28px; color:#516073; font-weight:700; position:relative; }
-    .switch-tab.active { color: var(--blue); }
-    .switch-tab.active:after { content:""; height:3px; background:var(--blue); left:0; right:0; bottom:0; position:absolute; }
-    .badge { margin-left:8px; background:#e7eef9; color:#536378; border-radius:12px; padding:1px 8px; font-size:12px; }
-    .switch-tab.active .badge { background:var(--blue); color:#fff; }
+    .drawer-mask, .modal-mask { position: fixed; inset: 0; background: rgba(11, 29, 54, .32); z-index: 30; display: none; }
+    .drawer { position: fixed; right: 0; top: 0; height: 100vh; width: 620px; background: #fff; z-index: 40; box-shadow: -16px 0 40px rgba(14, 40, 73, .24); transform: translateX(102%); transition: transform .2s ease; display: flex; flex-direction: column; }
+    .drawer.open { transform: translateX(0); }
+    .drawer-head { height: 62px; background: linear-gradient(90deg, var(--blue), #438ff2); color: #fff; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; }
+    .drawer-title { font-size: 18px; font-weight: 850; }
+    .close { width: 30px; height: 30px; border-radius: 50%; border: 0; background: rgba(255,255,255,.18); color: #fff; font-size: 18px; }
+    .drawer-body { padding: 18px; overflow: auto; flex: 1; }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .span2 { grid-column: span 2; }
+    .drawer-foot { height: 60px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding: 0 18px; border-top: 1px solid var(--line); background: #fbfdff; }
 
-    table { width:100%; border-collapse: collapse; table-layout: fixed; }
-    th {
-      background:#eef4fc; color:#31445f; font-weight:700; height:40px; text-align:left; padding:0 10px; font-size:14px;
-      border-right:1px solid #e0e7ef; white-space:nowrap;
-    }
-    td {
-      height:42px; border-top:1px solid #edf1f6; border-right:1px solid #edf1f6; padding:0 10px;
-      font-size:14px; color:#1f2d3d; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-    }
-    tr:hover td { background:#f8fbff; }
-    .status { display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:11px; font-size:12px; }
-    .status.on { background:#e8f8f2; color:#0b9d67; }
-    .status.draft { background:#fff4e6; color:#c67812; }
-    .link { color:var(--blue); font-weight:700; margin-right:10px; }
-    .table-foot {
-      height:44px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; border-top:1px solid var(--line);
-      color:#6f7d90; font-size:13px;
-    }
-    .pages { display:flex; gap:6px; align-items:center; }
-    .page-no { width:26px; height:26px; display:flex; align-items:center; justify-content:center; border:1px solid #dbe5f0; border-radius:4px; }
-    .page-no.active { background:var(--blue); color:#fff; border-color:var(--blue); }
+    .modal { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(.96); width: 680px; background: #fff; border-radius: 14px; z-index: 45; box-shadow: 0 18px 60px rgba(14,40,73,.28); display: none; overflow: hidden; }
+    .modal.open { display: block; animation: pop .16s ease forwards; }
+    @keyframes pop { to { transform: translate(-50%, -50%) scale(1); } }
+    .modal-head { height: 58px; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; border-bottom: 1px solid var(--line); }
+    .modal-title { font-weight: 850; font-size: 17px; color: #1e3555; }
+    .modal-body { padding: 18px; }
+    .upload { border: 1px dashed #9abef0; background: #f3f8ff; border-radius: 12px; height: 132px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #60789d; margin: 14px 0; }
+    .upload-icon { font-size: 34px; color: var(--blue); margin-bottom: 8px; }
+    .progress { height: 8px; background: #e9eef6; border-radius: 6px; overflow: hidden; margin-top: 12px; display: none; }
+    .progress span { display: block; height: 100%; width: 0; background: linear-gradient(90deg,var(--blue),#62b4ff); transition: width .4s ease; }
+    .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 12px; }
+    .check-item { background: #f8fbff; border: 1px solid var(--line); border-radius: 10px; padding: 10px; font-size: 13px; color: #536378; }
+    .check-item b { color: var(--green); margin-right: 5px; }
+    .modal-foot { height: 58px; border-top: 1px solid var(--line); background: #fbfdff; display: flex; justify-content: flex-end; align-items: center; gap: 10px; padding: 0 18px; }
 
-    .side-card { padding: 14px; }
-    .side-section { border-bottom:1px solid var(--line); padding-bottom:14px; margin-bottom:14px; }
-    .side-section:last-child { border-bottom:0; margin-bottom:0; padding-bottom:0; }
-    .side-title { font-size:15px; font-weight:700; color:#1e3555; margin-bottom:12px; display:flex; justify-content:space-between; }
-    .metric-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    .mini-metric { background:#f6f9fd; border:1px solid #e7eef7; border-radius:8px; padding:12px; }
-    .mini-label { font-size:12px; color:#748195; margin-bottom:6px; }
-    .mini-value { font-size:20px; font-weight:800; color:#1e3555; }
-    .rule-item { background:#f8fbff; border:1px solid #e5eef9; border-radius:8px; padding:10px; margin-bottom:8px; }
-    .rule-top { display:flex; justify-content:space-between; margin-bottom:7px; font-weight:700; color:#243956; }
-    .rule-desc { color:#748195; font-size:12px; line-height:1.5; }
-    .param-row { display:flex; justify-content:space-between; align-items:center; height:34px; font-size:13px; border-bottom:1px dashed #e2e9f2; }
-    .param-row:last-child { border-bottom:0; }
-    .param-value { color:var(--blue); font-weight:700; }
+    .toast { position: fixed; right: 24px; top: 82px; min-width: 260px; height: 44px; border-radius: 10px; background: #102844; color: #fff; display: none; align-items: center; padding: 0 16px; gap: 10px; box-shadow: 0 12px 32px rgba(16,40,68,.28); z-index: 60; font-size: 14px; }
+    .toast.show { display: flex; animation: slide .18s ease; }
+    @keyframes slide { from { transform: translateX(20px); opacity: .4; } to { transform: translateX(0); opacity: 1; } }
 
-    .drawer {
-      position: fixed; right: 24px; top: 112px; width: 480px; background:#fff; border-radius:12px; box-shadow:0 16px 48px rgba(31,64,115,.22);
-      border:1px solid #dfe8f3; overflow:hidden;
-    }
-    .drawer-head { height:54px; background:#1f78ea; color:#fff; display:flex; align-items:center; justify-content:space-between; padding:0 18px; font-weight:700; }
-    .drawer-body { padding:16px; }
-    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .textarea { height:72px; align-items:flex-start; padding-top:9px; line-height:1.5; }
-    .drawer-foot { display:flex; justify-content:flex-end; gap:10px; padding:14px 16px; border-top:1px solid var(--line); background:#fafcff; }
-
-    .import-modal {
-      position: fixed; left: 44px; bottom: 34px; width: 520px; background:#fff; border-radius:12px; box-shadow:0 16px 40px rgba(31,64,115,.2);
-      border:1px solid #dfe8f3; overflow:hidden;
-    }
-    .upload-box {
-      height:106px; border:1px dashed #98bdf1; background:#f3f8ff; border-radius:8px; display:flex; flex-direction:column;
-      align-items:center; justify-content:center; color:#5e77a0; margin-top:10px;
-    }
-    .upload-icon { color:var(--blue); font-size:30px; margin-bottom:6px; }
-    .hint-list { margin:10px 0 0; padding-left:18px; color:#748195; font-size:12px; line-height:1.8; }
+    .empty { padding: 42px; text-align: center; color: #8c98aa; }
   </style>
 </head>
 <body>
-  <div class="topbar">
-    <div class="brand"><div class="logo"></div><div class="brand-title">大数据平台</div></div>
-    <div class="nav">
-      <div class="nav-item">进销存分析</div><div class="nav-item">库存分析</div><div class="nav-item">顾客分析</div><div class="nav-item">采购分析</div><div class="nav-item">提货分析</div><div class="nav-item active">风险管控</div><div class="nav-item">离线分析</div>
-    </div>
-    <div class="search">搜索</div><div class="icons"><span>□</span><span>◇</span><span>⌗</span></div><div class="avatar">cdf</div>
-  </div>
-
-  <div class="tabs">
-    <div class="tab">经营看板 ×</div>
-    <div class="tab">销售业务合规风险（规模以下） ×</div>
-    <div class="tab active">填报数据源维护 ×</div>
-  </div>
-
-  <div class="page">
-    <div class="page-title-row">
-      <div class="title-block">
-        <div class="page-title">销售业务合规风险填报数据源维护</div>
-        <div class="page-subtitle">用于维护 BI 报表展示数据源，支持导入、新增、查询、修改、阈值配置，不影响已发布 BI 原型。</div>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="logo"></div>
+        <div><div class="brand-main">风险填报系统</div><div class="brand-sub">BI 数据源维护平台</div></div>
       </div>
-      <div class="update-time"><span class="dot"></span> 数据更新时间：2026-05-15 08:30:00</div>
-    </div>
-
-    <div class="toolbar">
-      <div class="actions">
-        <button class="btn primary">↥ 导入填报数据</button>
-        <button class="btn green">＋ 新增记录</button>
-        <button class="btn ghost-blue">⚙ 配置阈值</button>
-        <button class="btn">⇩ 下载模板</button>
-        <button class="btn">↧ 导出查询结果</button>
+      <div class="menu">
+        <div class="menu-group">填报工作台</div>
+        <div class="menu-item active"><span class="ico">▣</span><span>销售风险填报</span></div>
+        <div class="menu-item"><span class="ico">⇧</span><span>批量导入</span></div>
+        <div class="menu-item"><span class="ico">✓</span><span>发布审核</span></div>
+        <div class="menu-group">基础配置</div>
+        <div class="menu-item"><span class="ico">⚙</span><span>规则阈值配置</span></div>
+        <div class="menu-item"><span class="ico">⌂</span><span>门店字典</span></div>
+        <div class="menu-item"><span class="ico">☰</span><span>导入日志</span></div>
+        <div class="menu-group">系统管理</div>
+        <div class="menu-item"><span class="ico">◎</span><span>权限管理</span></div>
       </div>
-      <div class="actions">
-        <button class="btn orange">提交发布到BI</button>
-        <button class="btn danger">作废选中</button>
-      </div>
-    </div>
+      <div class="sidebar-foot">当前原型为独立 GitHub Pages 目录发布，不影响其它已发布原型。</div>
+    </aside>
 
-    <div class="filter-card">
-      <div class="filter-grid">
-        <div class="field"><label>统计日期</label><div class="control">2026/05/01 至 2026/05/14</div></div>
-        <div class="field"><label>门店</label><div class="control"><span>全部门店</span><span>⌄</span></div></div>
-        <div class="field"><label>规则ID</label><div class="control"><span>全部规则ID</span><span>⌄</span></div></div>
-        <div class="field"><label>规则名称</label><div class="control"><span>全部规则</span><span>⌄</span></div></div>
-        <div class="field"><label>数据状态</label><div class="control"><span>待发布/已发布</span><span>⌄</span></div></div>
-        <div class="field"><label>填报批次</label><div class="control placeholder">请输入批次号</div></div>
-        <div class="filter-actions"><button class="btn primary">查询</button><button class="btn">重置</button></div>
-      </div>
-    </div>
+    <main class="main">
+      <header class="topbar">
+        <div class="breadcrumb"><span>首页</span><span>/</span><span>填报工作台</span><span>/</span><strong>销售业务合规风险填报</strong></div>
+        <div class="top-actions"><div class="global-search"><span>搜索规则ID / 门店 / 批次</span><span>⌕</span></div><span style="color:#748195;font-size:13px;">2026-05-20 10:32</span><div class="avatar">cdf</div></div>
+      </header>
 
-    <div class="content">
-      <div class="panel">
-        <div class="switch-tabs">
-          <div class="switch-tab active">汇总填报表<span class="badge">15</span></div>
-          <div class="switch-tab">异常明细填报表<span class="badge">16</span></div>
-          <div class="switch-tab">规则配置表<span class="badge">12</span></div>
-          <div class="switch-tab">阈值参数表<span class="badge">18</span></div>
-        </div>
-        <div class="panel-head">
-          <div class="panel-title"><span class="bar"></span>汇总填报数据</div>
-          <div class="panel-tip">按“统计日期 + 门店 + 规则ID + 阈值”维护，发布后作为 BI 汇总表数据源</div>
-        </div>
-        <table>
-          <colgroup>
-            <col style="width:52px"><col style="width:110px"><col style="width:290px"><col style="width:72px"><col style="width:210px"><col style="width:260px"><col style="width:210px"><col style="width:260px"><col style="width:92px"><col style="width:110px">
-          </colgroup>
-          <thead><tr><th>序号</th><th>统计日期</th><th>门店</th><th>规则ID</th><th>规则名称</th><th>规则内容</th><th>阈值</th><th>汇总值</th><th>状态</th><th>操作</th></tr></thead>
-          <tbody>
-            <tr><td>1</td><td>2026-05-14</td><td>[0818]海南海航中免免税品有限公司_美兰机场店</td><td>C01</td><td>同一证件高频购买</td><td>同一证件号30天内购买相同商品编码次数≥3次，或单日订单数≥5笔</td><td>次数阈值：3次/30天；单日订单阈值：5笔</td><td>同一证件30天同商品4次，单日订单5笔</td><td><span class="status on">已发布</span></td><td><span class="link">修改</span><span class="link">明细</span></td></tr>
-            <tr><td>2</td><td>2026-05-14</td><td>[0819]海南海航中免免税品有限公司_三亚机场店</td><td>C02</td><td>护照、身份信息相同，顾客姓名不同</td><td>30天内，同一护照身份信息存在不同顾客姓名，≥2笔</td><td>次数阈值：≥2次/30天</td><td>同护照信息对应3个顾客姓名</td><td><span class="status draft">待发布</span></td><td><span class="link">修改</span><span class="link">明细</span></td></tr>
-            <tr><td>3</td><td>2026-05-14</td><td>[6118]西安咸阳国际机场免税品有限公司</td><td>C03</td><td>购买时间异常</td><td>同一旅客连续购物时间存在逻辑错误，两笔订单间隔6-48小时</td><td>次数阈值：≥1次/30天；间隔时间6-48小时</td><td>两笔订单间隔8小时20分钟</td><td><span class="status on">已发布</span></td><td><span class="link">修改</span><span class="link">明细</span></td></tr>
-            <tr><td>4</td><td>2026-05-14</td><td>[6610]中国免税品（集团）有限责任公司大连分公司</td><td>C04</td><td>支付人与证件人不一致</td><td>同一支付账号30天内为≥3个不同证件号的订单付款</td><td>证件数阈值：3个；时间阈值：30天</td><td>同支付账号关联4个证件号</td><td><span class="status draft">待发布</span></td><td><span class="link">修改</span><span class="link">明细</span></td></tr>
-            <tr><td>5</td><td>2026-05-14</td><td>[6702]黑河市中免免税店有限责任公司</td><td>C05</td><td>大额现金结算</td><td>单笔现金支付金额≥5000元，或同一收银员日现金结算笔数占比＞30%</td><td>单笔阈值：5000元；现金占比阈值：30%</td><td>单笔现金支付6,800元</td><td><span class="status on">已发布</span></td><td><span class="link">修改</span><span class="link">明细</span></td></tr>
-            <tr><td>6</td><td>2026-05-14</td><td>[6743]满洲里中免免税品有限责任公司</td><td>C06</td><td>退货频率异常（笔数）</td><td>统计月份总退货笔数≥近一年月平均退货笔数×1.25</td><td>比例阈值：25%；计算系数：1.25</td><td>当月退货笔数为均值的1.32倍</td><td><span class="status on">已发布</span></td><td><span class="link">修改</span><span class="link">明细</span></td></tr>
-            <tr><td>7</td><td>2026-05-14</td><td>[6764]湖南中免免税品有限责任公司</td><td>C07</td><td>退货频率异常（金額）</td><td>统计月份总退货金额≥近一年月平均退货金额×1.05</td><td>比例阈值：5%；计算系数：1.05</td><td>当月退货金额为均值的1.12倍</td><td><span class="status draft">待发布</span></td><td><span class="link">修改</span><span class="link">明细</span></td></tr>
-            <tr><td>8</td><td>2026-05-14</td><td>[6791]厦门东免免税品有限公司</td><td>C08</td><td>低于成本销售</td><td>交易价格＜含税成本</td><td>交易价格＜含税成本</td><td>交易价格较含税成本低120元</td><td><span class="status on">已发布</span></td><td><span class="link">修改</span><span class="link">明细</span></td></tr>
-          </tbody>
-        </table>
-        <div class="table-foot"><div>共 15 条记录，已选择 0 条</div><div class="pages"><span class="page-no active">1</span><span class="page-no">2</span><span>10条/页</span></div></div>
-      </div>
-
-      <div class="panel side-card">
-        <div class="side-section">
-          <div class="side-title"><span>维护概览</span><span style="color:#1f78ea;font-size:13px;">本批次</span></div>
-          <div class="metric-grid">
-            <div class="mini-metric"><div class="mini-label">汇总记录</div><div class="mini-value">15</div></div>
-            <div class="mini-metric"><div class="mini-label">明细记录</div><div class="mini-value">16</div></div>
-            <div class="mini-metric"><div class="mini-label">待发布</div><div class="mini-value" style="color:#f59a23;">4</div></div>
-            <div class="mini-metric"><div class="mini-label">已发布</div><div class="mini-value" style="color:#19b67b;">11</div></div>
+      <section class="workspace">
+        <div class="hero">
+          <div class="hero-row">
+            <div>
+              <div class="hero-title">销售业务合规风险填报系统</div>
+              <div class="hero-desc">面向数据维护人员的填报后台：维护汇总、明细、规则阈值配置，发布后作为 BI 报表数据源。</div>
+            </div>
+            <div class="hero-steps">
+              <div class="step"><b>1</b>导入/新增</div><div class="step"><b>2</b>校验修改</div><div class="step"><b>3</b>提交发布</div><div class="step"><b>4</b>BI 读取</div>
+            </div>
           </div>
         </div>
-        <div class="side-section">
-          <div class="side-title"><span>阈值快捷配置</span><span style="color:#1f78ea;font-size:13px;">编辑</span></div>
-          <div class="param-row"><span>C01 同证同商品次数</span><span class="param-value">≥3次/30天</span></div>
-          <div class="param-row"><span>C05 单笔现金金额</span><span class="param-value">≥5000元</span></div>
-          <div class="param-row"><span>C09 临时折扣率</span><span class="param-value">≥25%</span></div>
-          <div class="param-row"><span>L01 提货时间窗口</span><span class="param-value">30分钟</span></div>
+
+        <div class="stats">
+          <div class="stat-card blue"><div class="stat-label">本批次汇总记录</div><div class="stat-value" id="statSummary">15</div><div class="stat-note">按门店+规则+阈值维护</div></div>
+          <div class="stat-card green"><div class="stat-label">异常明细记录</div><div class="stat-value" id="statDetail">16</div><div class="stat-note">作为下钻明细数据源</div></div>
+          <div class="stat-card orange"><div class="stat-label">规则阈值配置</div><div class="stat-value" id="statRule">12</div><div class="stat-note">规则配置与阈值参数已合并</div></div>
+          <div class="stat-card red"><div class="stat-label">待发布记录</div><div class="stat-value" id="statDraft">4</div><div class="stat-note">提交后供 BI 读取</div></div>
+          <div class="stat-card"><div class="stat-label">最近发布时间</div><div class="stat-value" style="font-size:20px;">08:30</div><div class="stat-note">2026-05-15 已发布版本</div></div>
         </div>
-        <div class="side-section">
-          <div class="side-title">规则说明</div>
-          <div class="rule-item"><div class="rule-top"><span>C04 支付人与证件人不一致</span><span>合规</span></div><div class="rule-desc">通过销售订单表与支付流水表关联，维护支付账号、交易卡号、商户订单号及关联证件数。</div></div>
-          <div class="rule-item"><div class="rule-top"><span>L01 代购团伙识别</span><span>联动</span></div><div class="rule-desc">联动购买人证件、支付账号、提货人及集中提货时间窗口，输出异常提货与订单信息。</div></div>
+
+        <div class="filter-card">
+          <div class="filter-head"><div class="section-title">查询条件</div><button class="btn soft" onclick="toggleAdvanced()">展开高级筛选</button></div>
+          <div class="filter-grid">
+            <div class="field"><label>统计日期</label><input class="input" id="dateRange" value="2026/05/01 至 2026/05/14" /></div>
+            <div class="field"><label>门店</label><select class="select" id="storeFilter"><option>全部门店</option><option>[0818]美兰机场店</option><option>[6702]黑河免税店</option></select></div>
+            <div class="field"><label>规则ID</label><select class="select" id="ruleFilter"><option>全部规则ID</option><option>C01</option><option>C05</option><option>L01</option></select></div>
+            <div class="field"><label>规则名称</label><input class="input" id="keyword" placeholder="输入规则名称/门店/批次" /></div>
+            <div class="field"><label>数据状态</label><select class="select" id="statusFilter"><option>全部状态</option><option>待发布</option><option>已发布</option><option>已作废</option></select></div>
+            <div class="field"><label>填报批次</label><input class="input" value="B20260515001" /></div>
+            <div class="btns"><button class="btn primary" onclick="queryData()">查询</button><button class="btn" onclick="resetQuery()">重置</button></div>
+          </div>
+          <div id="advanced" style="display:none;margin-top:12px;grid-template-columns:repeat(4,1fr);gap:12px;" class="filter-grid">
+            <div class="field"><label>填报人</label><input class="input" placeholder="请输入填报人" /></div>
+            <div class="field"><label>更新时间</label><input class="input" placeholder="最近7天" /></div>
+            <div class="field"><label>发布状态</label><select class="select"><option>全部</option><option>未提交</option><option>已提交</option></select></div>
+            <div class="field"><label>校验结果</label><select class="select"><option>全部</option><option>通过</option><option>不通过</option></select></div>
+          </div>
         </div>
-      </div>
-    </div>
+
+        <div class="table-card">
+          <div class="tabbar">
+            <div class="tab active" data-tab="summary" onclick="switchTab('summary')">汇总填报表<span class="badge">15</span></div>
+            <div class="tab" data-tab="detail" onclick="switchTab('detail')">异常明细填报表<span class="badge">16</span></div>
+            <div class="tab" data-tab="rule" onclick="switchTab('rule')">规则阈值配置填报表<span class="badge">12</span></div>
+            <div class="tab" data-tab="log" onclick="switchTab('log')">导入发布记录<span class="badge">6</span></div>
+          </div>
+          <div class="table-head">
+            <div class="table-title-wrap"><div class="table-title" id="tableTitle">汇总填报表</div><div class="table-desc" id="tableDesc">维护 BI 汇总展示数据源，字段按“统计日期 + 门店 + 规则ID + 阈值 + 汇总值”组织。</div></div>
+            <div class="table-actions">
+              <button class="btn primary" onclick="openImport()">⇧ 导入</button>
+              <button class="btn green" onclick="openDrawer('add')">＋ 新增</button>
+              <button class="btn soft" onclick="openDrawer('threshold')">⚙ 配置规则阈值</button>
+              <button class="btn" onclick="downloadTemplate()">⇩ 下载模板</button>
+              <button class="btn orange" onclick="publishData()">提交发布</button>
+              <button class="btn red" onclick="voidSelected()">作废</button>
+            </div>
+          </div>
+          <div class="table-wrap"><table id="dataTable"></table></div>
+          <div class="foot"><div id="footInfo">共 15 条记录，已选择 0 条</div><div class="pages"><span class="page-no active">1</span><span class="page-no">2</span><span class="page-no">3</span><span>10条/页</span></div></div>
+        </div>
+      </section>
+    </main>
   </div>
 
-  <div class="drawer">
-    <div class="drawer-head"><span>修改汇总填报记录</span><span>×</span></div>
-    <div class="drawer-body">
+  <div class="drawer-mask" id="drawerMask" onclick="closeDrawer()"></div>
+  <aside class="drawer" id="drawer">
+    <div class="drawer-head"><div class="drawer-title" id="drawerTitle">新增填报记录</div><button class="close" onclick="closeDrawer()">×</button></div>
+    <div class="drawer-body" id="drawerBody"></div>
+    <div class="drawer-foot"><button class="btn" onclick="closeDrawer()">取消</button><button class="btn primary" onclick="saveForm()">保存</button><button class="btn orange" onclick="saveAndPublish()">保存并提交</button></div>
+  </aside>
+
+  <div class="modal-mask" id="modalMask" onclick="closeImport()"></div>
+  <div class="modal" id="importModal">
+    <div class="modal-head"><div class="modal-title">导入填报数据</div><button class="btn" onclick="closeImport()">关闭</button></div>
+    <div class="modal-body">
       <div class="form-grid">
-        <div class="field"><label>统计日期</label><div class="control">2026-05-14</div></div>
-        <div class="field"><label>规则ID</label><div class="control">C05</div></div>
-        <div class="field" style="grid-column:span 2;"><label>门店</label><div class="control">[6702]黑河市中免免税店有限责任公司</div></div>
-        <div class="field" style="grid-column:span 2;"><label>阈值说明</label><div class="control">单笔阈值：5000元；现金占比阈值：30%</div></div>
-        <div class="field" style="grid-column:span 2;"><label>汇总值</label><div class="control textarea">单笔现金支付6,800元；收银员当日现金笔数占比32%</div></div>
-        <div class="field"><label>数据状态</label><div class="control">待发布</div></div>
-        <div class="field"><label>填报批次</label><div class="control">B20260515001</div></div>
+        <div class="field"><label>导入表类型</label><select class="select" id="importType"><option>汇总填报表</option><option>异常明细填报表</option><option>规则阈值配置填报表</option><option>全量填报模板</option></select></div>
+        <div class="field"><label>导入批次</label><input class="input" value="B20260520001" /></div>
+      </div>
+      <div class="upload" onclick="startImport()"><div class="upload-icon">⇧</div><div><b>点击上传 Excel 文件</b></div><div style="font-size:12px;margin-top:5px;">支持 .xlsx，系统会校验必填项、规则ID、阈值格式和重复记录</div></div>
+      <div class="progress" id="progress"><span id="progressBar"></span></div>
+      <div class="checklist" id="checklist" style="display:none;">
+        <div class="check-item"><b>✓</b>字段完整性校验通过</div><div class="check-item"><b>✓</b>规则ID与配置表匹配</div><div class="check-item"><b>✓</b>阈值格式校验通过</div><div class="check-item"><b>✓</b>生成待发布记录 15 条</div>
       </div>
     </div>
-    <div class="drawer-foot"><button class="btn">取消</button><button class="btn primary">保存修改</button></div>
+    <div class="modal-foot"><button class="btn" onclick="downloadTemplate()">下载标准模板</button><button class="btn primary" onclick="startImport()">开始导入</button></div>
   </div>
 
-  <div class="import-modal">
-    <div class="drawer-head"><span>导入填报数据</span><span>模板校验</span></div>
-    <div class="drawer-body">
-      <div class="field"><label>导入类型</label><div class="control"><span>汇总填报表 + 异常明细填报表</span><span>⌄</span></div></div>
-      <div class="upload-box"><div class="upload-icon">↥</div><div>点击或拖拽 Excel 文件到此处上传</div><div style="font-size:12px;margin-top:4px;">支持 .xlsx，导入后进入待发布状态</div></div>
-      <ul class="hint-list"><li>系统按规则ID、门店、统计日期校验必填项。</li><li>阈值参数可在右侧快捷配置或阈值参数表中维护。</li><li>发布后 BI 报表读取本批次已发布数据。</li></ul>
-    </div>
-  </div>
+  <div class="toast" id="toast"><span>✓</span><span id="toastText">操作成功</span></div>
+
+  <script>
+    const summaryRows = [
+      ['2026-05-14','[0818]海南海航中免免税品有限公司_美兰机场店','C01','同一证件高频购买','合规','次数阈值：3次/30天；单日订单阈值：5笔','同一证件30天同商品4次，单日订单5笔','B20260515001','已发布'],
+      ['2026-05-14','[0819]海南海航中免免税品有限公司_三亚机场店','C02','护照、身份信息相同，顾客姓名不同','合规','次数阈值：≥2次/30天','同护照信息对应3个顾客姓名','B20260515001','待发布'],
+      ['2026-05-14','[6118]西安咸阳国际机场免税品有限公司','C03','购买时间异常','合规','间隔时间：6-48小时','两笔订单间隔8小时20分钟','B20260515001','已发布'],
+      ['2026-05-14','[6610]中国免税品（集团）有限责任公司大连分公司','C04','支付人与证件人不一致','合规','证件数阈值：3个；时间阈值：30天','同支付账号关联4个证件号','B20260515001','待发布'],
+      ['2026-05-14','[6702]黑河市中免免税店有限责任公司','C05','大额现金结算','合规','单笔阈值：5000元；现金占比阈值：30%','单笔现金支付6,800元','B20260515001','已发布'],
+      ['2026-05-14','[6764]湖南中免免税品有限责任公司','C07','退货频率异常（金额）','合规','比例阈值：5%；计算系数：1.05','当月退货金额为均值的1.12倍','B20260515001','待发布']
+    ];
+    const detailRows = [
+      ['M202605140001','2026-05-14','[0818]美兰机场店','C01','SO202605140018','P000332','香化套装','护照','EJ882991','张敏','3499.00','同一证件30天同商品4次','已发布'],
+      ['M202605140002','2026-05-14','[0819]三亚机场店','C02','SO202605140024','P000119','精品手表','护照','EG112782','李华/李桦','8500.00','同证件存在不同顾客姓名','待发布'],
+      ['M202605140003','2026-05-14','[6702]黑河免税店','C05','SO202605140099','P000886','烟酒组合','身份证','2301********8819','王强','6800.00','单笔现金支付≥5000元','已发布']
+    ];
+    const ruleRows = [
+      ['C01','同一证件高频购买','合规','审计监督-销售业务合规风险（规模以下）','除外供店、机上店','同一证件号30天内购买相同商品编码次数≥3次，或单日订单数≥5笔','销售订单表：证件号、商品编码、销售日期','次数阈值/单日订单阈值','3 / 5','次/笔','≥','30天/1天','异常订单清单：销售明细表所有字段','启用'],
+      ['C04','支付人与证件人不一致','合规','审计监督-销售业务合规风险（规模以下）','除外供店、机上店之外的门店','同一支付账号30天内为≥3个不同证件号的订单付款','销售订单表+支付流水表：支付账号、证件号、交易卡号、商户订单号','证件数阈值/时间阈值','3 / 30','个/天','≥','30天','异常订单清单+交易卡号+商户订单号+支付账号、关联证件数','启用'],
+      ['C05','大额现金结算','合规','审计监督-销售业务合规风险（规模以下）','除外供店、边境店、机上店之外的门店','单笔订单现金支付金额≥5000元，或同一收银员日现金结算笔数占比＞30%','销售订单表：小票号、收款方式、成交金额、收银员、销售日期','单笔现金金额/现金占比','5000 / 30','元/%','≥ / ＞','单笔/1天','异常订单及异常收银员清单','启用'],
+      ['C09','临时折扣超权限','合规','审计监督-销售业务合规风险（规模以下）','全部','临时折扣/售价 大于等于 25%','销售订单表：临时折扣、售价','折扣率阈值','25','%','≥','单笔','异常订单清单','启用'],
+      ['L01','代购团伙识别','联动','审计监督-销售业务合规风险（规模以下）','机场店、市内店','多个购买人证件≥3由同一支付账号付款，且提货集中在30分钟内由同一人签字提货','销售订单表+支付流水表+提货记录表','证件数/提货时间窗口','3 / 30','个/分钟','≥ / ≤','30分钟','异常的提货信息+订单信息','启用']
+    ];
+    const logRows = [
+      ['B20260520001','全量填报模板','2026-05-20 10:30','王芳','15','16','12','校验通过','待发布'],
+      ['B20260515001','汇总填报表','2026-05-15 08:30','系统导入','15','16','12','校验通过','已发布'],
+      ['B20260514002','规则阈值配置填报表','2026-05-14 18:10','李明','0','0','3','校验通过','已发布']
+    ];
+
+    const configs = {
+      summary: {
+        title: '汇总填报表',
+        desc: '维护 BI 汇总展示数据源，字段按“统计日期 + 门店 + 规则ID + 阈值 + 汇总值”组织。',
+        count: 15,
+        headers: ['','序号','统计日期','门店','规则ID','规则名称','规则类型','阈值','汇总值','填报批次','状态','操作'],
+        widths: ['42px','56px','110px','300px','80px','210px','90px','250px','270px','130px','92px','130px'],
+        rows: summaryRows
+      },
+      detail: {
+        title: '异常明细填报表',
+        desc: '维护可下钻的异常订单、支付、提货和联动风险明细，一行对应一条异常记录。',
+        count: 16,
+        headers: ['','序号','明细ID','销售日期','门店','规则ID','订单号','商品编码','商品名称','证件号','顾客姓名','成交金额','命中原因','状态','操作'],
+        widths: ['42px','56px','140px','110px','230px','80px','150px','120px','160px','150px','120px','110px','250px','92px','130px'],
+        rows: detailRows
+      },
+      rule: {
+        title: '规则阈值配置填报表',
+        desc: '已将原“规则配置表”和“阈值参数表”合并为一张可维护填报表，规则说明和阈值参数同表维护。',
+        count: 12,
+        headers: ['','序号','规则ID','规则名称','规则类型','场景','适用店型','判断逻辑','数据来源字段','阈值参数项','参数值','单位','比较符','时间窗口','输出内容','状态','操作'],
+        widths: ['42px','56px','80px','190px','90px','260px','210px','360px','310px','190px','100px','80px','90px','110px','260px','90px','130px'],
+        rows: ruleRows
+      },
+      log: {
+        title: '导入发布记录',
+        desc: '记录每个填报批次的导入、校验、提交和发布状态，便于追溯 BI 数据源版本。',
+        count: 6,
+        headers: ['','序号','填报批次','导入类型','导入时间','操作人','汇总记录','明细记录','规则阈值记录','校验结果','发布状态','操作'],
+        widths: ['42px','56px','150px','180px','160px','110px','100px','100px','120px','110px','100px','160px'],
+        rows: logRows
+      }
+    };
+
+    let currentTab = 'summary';
+
+    function renderTable() {
+      const cfg = configs[currentTab];
+      document.getElementById('tableTitle').textContent = cfg.title;
+      document.getElementById('tableDesc').textContent = cfg.desc;
+      document.getElementById('footInfo').textContent = `共 ${cfg.count} 条记录，已选择 0 条`;
+      const colgroup = '<colgroup>' + cfg.widths.map(w => `<col style="width:${w}">`).join('') + '</colgroup>';
+      const thead = '<thead><tr>' + cfg.headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead>';
+      const rows = cfg.rows.map((row, i) => {
+        const cells = [`<td><input type="checkbox" class="check" onchange="updateSelected()"></td>`, `<td>${i + 1}</td>`]
+          .concat(row.map((v, idx) => {
+            const isStatus = idx === row.length - 1;
+            if (isStatus) return `<td>${statusTag(v)}</td>`;
+            if (currentTab === 'rule' && idx === 2 && v === '联动') return `<td><span class="tag linkage">${v}</span></td>`;
+            return `<td title="${String(v).replace(/"/g,'&quot;')}">${v}</td>`;
+          }))
+          .concat([`<td><span class="op" onclick="openDrawer('edit')">修改</span><span class="op" onclick="previewRow()">查看</span><span class="op red" onclick="voidSelected()">作废</span></td>`]);
+        return '<tr>' + cells.join('') + '</tr>';
+      }).join('');
+      document.getElementById('dataTable').innerHTML = colgroup + thead + '<tbody>' + rows + '</tbody>';
+    }
+
+    function statusTag(v) {
+      const cls = v === '已发布' ? 'published' : v === '已作废' ? 'invalid' : 'draft';
+      return `<span class="tag ${cls}">${v}</span>`;
+    }
+
+    function switchTab(tab) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(el => el.classList.toggle('active', el.dataset.tab === tab));
+      renderTable();
+      showToast(`已切换到${configs[tab].title}`);
+    }
+
+    function updateSelected() {
+      const selected = document.querySelectorAll('.check:checked').length;
+      document.getElementById('footInfo').textContent = `共 ${configs[currentTab].count} 条记录，已选择 ${selected} 条`;
+    }
+
+    function toggleAdvanced() {
+      const el = document.getElementById('advanced');
+      el.style.display = el.style.display === 'none' ? 'grid' : 'none';
+    }
+
+    function queryData() {
+      renderTable();
+      showToast('查询完成，已刷新当前填报表数据');
+    }
+
+    function resetQuery() {
+      document.getElementById('keyword').value = '';
+      document.getElementById('storeFilter').selectedIndex = 0;
+      document.getElementById('ruleFilter').selectedIndex = 0;
+      document.getElementById('statusFilter').selectedIndex = 0;
+      showToast('查询条件已重置');
+    }
+
+    function openDrawer(mode) {
+      const titleMap = { add: '新增填报记录', edit: '修改填报记录', threshold: '配置规则阈值' };
+      document.getElementById('drawerTitle').textContent = titleMap[mode] || '维护填报记录';
+      document.getElementById('drawerBody').innerHTML = mode === 'threshold' ? thresholdForm() : dataForm(mode);
+      document.getElementById('drawerMask').style.display = 'block';
+      document.getElementById('drawer').classList.add('open');
+    }
+
+    function closeDrawer() {
+      document.getElementById('drawerMask').style.display = 'none';
+      document.getElementById('drawer').classList.remove('open');
+    }
+
+    function dataForm(mode) {
+      const isDetail = currentTab === 'detail';
+      const isRule = currentTab === 'rule';
+      if (isRule) return thresholdForm();
+      return `<div class="form-grid">
+        <div class="field"><label>统计日期</label><input class="input" value="2026-05-14"></div>
+        <div class="field"><label>填报批次</label><input class="input" value="B20260520001"></div>
+        <div class="field span2"><label>门店</label><select class="select"><option>[0818]海南海航中免免税品有限公司_美兰机场店</option><option>[6702]黑河市中免免税店有限责任公司</option></select></div>
+        <div class="field"><label>规则ID</label><select class="select"><option>C01</option><option>C04</option><option>C05</option><option>L01</option></select></div>
+        <div class="field"><label>规则名称</label><input class="input" value="${isDetail ? '大额现金结算' : '同一证件高频购买'}"></div>
+        ${isDetail ? '<div class="field"><label>订单号</label><input class="input" value="SO202605140099"></div><div class="field"><label>成交金额</label><input class="input" value="6800.00"></div><div class="field"><label>证件号</label><input class="input" value="2301********8819"></div><div class="field"><label>顾客姓名</label><input class="input" value="王强"></div>' : '<div class="field span2"><label>阈值说明</label><input class="input" value="次数阈值：3次/30天；单日订单阈值：5笔"></div>'}
+        <div class="field span2"><label>${isDetail ? '命中原因' : '汇总值'}</label><textarea>${isDetail ? '单笔现金支付金额6,800元，超过规则阈值5,000元。' : '同一证件30天内购买相同商品4次，单日订单5笔。'}</textarea></div>
+        <div class="field"><label>数据状态</label><select class="select"><option>待发布</option><option>已发布</option><option>已作废</option></select></div>
+        <div class="field"><label>填报人</label><input class="input" value="王芳"></div>
+      </div>`;
+    }
+
+    function thresholdForm() {
+      return `<div class="form-grid">
+        <div class="field"><label>规则ID</label><input class="input" value="C05"></div>
+        <div class="field"><label>规则名称</label><input class="input" value="大额现金结算"></div>
+        <div class="field"><label>规则类型</label><select class="select"><option>合规</option><option>联动</option></select></div>
+        <div class="field"><label>状态</label><select class="select"><option>启用</option><option>停用</option></select></div>
+        <div class="field span2"><label>场景</label><input class="input" value="审计监督-销售业务合规风险（规模以下）"></div>
+        <div class="field span2"><label>适用店型</label><input class="input" value="除外供店、边境店、机上店之外的门店"></div>
+        <div class="field span2"><label>判断逻辑</label><textarea>单笔订单现金支付金额≥5000元，或同一收银员日现金结算笔数占比＞30%。</textarea></div>
+        <div class="field span2"><label>数据来源字段</label><textarea>销售订单表：小票号、收款方式、成交金额、收银员、销售日期。</textarea></div>
+        <div class="field"><label>阈值参数项</label><input class="input" value="单笔现金金额 / 现金占比"></div>
+        <div class="field"><label>参数值</label><input class="input" value="5000 / 30"></div>
+        <div class="field"><label>单位</label><input class="input" value="元 / %"></div>
+        <div class="field"><label>比较符</label><input class="input" value="≥ / ＞"></div>
+        <div class="field"><label>时间窗口</label><input class="input" value="单笔 / 1天"></div>
+        <div class="field"><label>输出内容</label><input class="input" value="异常订单及异常收银员清单"></div>
+      </div>`;
+    }
+
+    function saveForm() {
+      closeDrawer();
+      showToast('保存成功，记录已进入待发布状态');
+    }
+
+    function saveAndPublish() {
+      closeDrawer();
+      showToast('保存成功，已提交发布队列');
+    }
+
+    function openImport() {
+      document.getElementById('modalMask').style.display = 'block';
+      document.getElementById('importModal').classList.add('open');
+    }
+
+    function closeImport() {
+      document.getElementById('modalMask').style.display = 'none';
+      document.getElementById('importModal').classList.remove('open');
+    }
+
+    function startImport() {
+      const progress = document.getElementById('progress');
+      const bar = document.getElementById('progressBar');
+      progress.style.display = 'block';
+      bar.style.width = '15%';
+      setTimeout(() => bar.style.width = '62%', 250);
+      setTimeout(() => bar.style.width = '100%', 650);
+      setTimeout(() => { document.getElementById('checklist').style.display = 'grid'; showToast('导入完成，校验通过，生成待发布数据'); }, 900);
+    }
+
+    function downloadTemplate() { showToast('已生成下载任务：标准填报模板.xlsx'); }
+    function publishData() { showToast('提交发布成功，BI 将读取最新已发布数据'); }
+    function voidSelected() { showToast('已作废选中记录，发布数据不受影响'); }
+    function previewRow() { showToast('已打开记录详情预览'); }
+
+    function showToast(text) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastText').textContent = text;
+      toast.classList.add('show');
+      clearTimeout(window.toastTimer);
+      window.toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
+    }
+
+    renderTable();
+  </script>
 </body>
 </html>
