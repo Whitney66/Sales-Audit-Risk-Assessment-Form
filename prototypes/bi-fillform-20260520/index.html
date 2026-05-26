@@ -24,7 +24,7 @@
   <div class="mask" id="mask" onclick="closeAll()"></div>
   <section class="modal" id="formModal"><div class="modal-head"><span id="formTitle">新增规则配置</span><button class="modal-close" onclick="closeAll()">×</button></div><div class="modal-body" id="formBody"></div><div class="modal-foot"><button class="btn" onclick="closeAll()">取消</button><button class="btn primary" onclick="saveForm()">保存</button></div></section>
   <section class="modal small" id="importModal"><div class="modal-head"><span>导入规则配置</span><button class="modal-close" onclick="closeAll()">×</button></div><div class="modal-body"><div class="form-item"><label>导入批次</label><input class="input" value="RULE20260520001"/></div><div class="upload-box" onclick="simulateImport()"><div class="upload-icon">⇧</div><b>点击或拖拽 Excel 文件到此处上传</b><div style="font-size:13px;margin-top:6px;">支持 .xlsx，导入后可直接维护参数项</div></div><div class="progress" id="progress"><span id="progressBar"></span></div><div class="hint">导入校验：规则ID、规则名称、规则类型、参数项1、关联关系、参数项2、逻辑说明。</div></div><div class="modal-foot"><button class="btn primary" onclick="simulateImport()">开始导入</button></div></section>
-  <section class="modal small" id="guideModal"><div class="modal-head"><span>数据说明</span><button class="modal-close" onclick="closeAll()">×</button></div><div class="modal-body"><div class="hint" style="margin-top:0">1. 筛选项保留规则类型、规则ID和规则名称。<br/>2. 规则ID与规则名称双向联动，规则名称支持模糊搜索后多选。<br/>3. 参数项按“参数项1 / 关联关系 / 参数项2 / 逻辑说明”展示，点击编辑后仅阈值数值可修改。<br/>4. 删除前会弹出确认提示，点击行内保存后阈值配置恢复为只读展示。</div></div><div class="modal-foot"><button class="btn primary" onclick="closeAll()">知道了</button></div></section>
+  <section class="modal small" id="guideModal"><div class="modal-head"><span>数据说明</span><button class="modal-close" onclick="closeAll()">×</button></div><div class="modal-body"><div class="hint" style="margin-top:0">1. 筛选项保留规则类型、规则ID和规则名称，调整筛选项后需点击查询按钮刷新列表。<br/>2. 规则ID与规则名称双向联动，规则名称支持模糊搜索后多选。<br/>3. 参数项按“参数项1 / 关联关系 / 参数项2 / 逻辑说明”展示，点击编辑后仅阈值数值可修改。<br/>4. 删除前会弹出确认提示，点击行内保存后阈值配置恢复为只读展示。</div></div><div class="modal-foot"><button class="btn primary" onclick="closeAll()">知道了</button></div></section>
   <section class="modal small" id="deleteModal"><div class="modal-head"><span>删除确认</span><button class="modal-close" onclick="closeAll()">×</button></div><div class="modal-body"><div class="hint" style="margin-top:0">确认删除该规则配置吗？删除后当前列表中将不再展示该规则。</div></div><div class="modal-foot"><button class="btn" onclick="closeAll()">取消</button><button class="btn danger" onclick="deleteRow()">确认删除</button></div></section>
   <div class="toast" id="toast"><span>✓</span><span id="toastText">操作成功</span></div>
   <script>
@@ -38,12 +38,15 @@
     ];
     let selectedRuleIds=new Set(rows.map(r=>r.id));
     let selectedRuleNames=new Set(rows.map(r=>r.name));
+    let appliedRuleIds=new Set(selectedRuleIds);
+    let appliedRuleNames=new Set(selectedRuleNames);
+    let appliedRuleType='全部';
     let ruleNameKeyword='';
     let editingIndex=null;
     let pendingDeleteIndex=null;
 
     function render(){const filtered=getFilteredRows();const headers=['','<span class="required">*</span>规则ID','<span class="required">*</span>规则名称','规则类型','场景','参数项1','关联关系','参数项2','逻辑说明','操作'];const widths=['52px','90px','230px','90px','270px','370px','110px','370px','430px','138px'];const col='<colgroup>'+widths.map(w=>`<col style="width:${w}">`).join('')+'</colgroup>';const thead='<thead><tr>'+headers.map(h=>`<th>${h}</th>`).join('')+'</tr></thead>';const tbody='<tbody>'+filtered.map(({r,i})=>`<tr><td><input type="checkbox" class="checkbox"></td><td class="ellipsis" title="${esc(r.id)}">${r.id}</td><td class="ellipsis" title="${esc(r.name)}">${r.name}</td><td class="ellipsis" title="${esc(r.type)}">${r.type}</td><td class="multiline" title="${esc(r.scene)}">${r.scene}</td><td class="params-cell">${editingIndex===i?renderParamEditor(r.params[0],i,0):renderParam(r.params[0])}</td><td>${renderRelation(r)}</td><td class="params-cell">${editingIndex===i&&r.params[1]?renderParamEditor(r.params[1],i,1):renderParam(r.params[1])}</td><td class="multiline" title="${esc(r.logic)}">${r.logic}</td><td>${editingIndex===i?`<span class="op-link" onclick="saveRow(${i})">保存</span><span class="op-link danger" onclick="cancelEdit()">取消</span>`:`<span class="op-link" onclick="editRow(${i})">编辑</span><span class="op-link danger" onclick="confirmDelete(${i})">删除</span>`}</td></tr>`).join('')+'</tbody>';document.getElementById('dataTable').innerHTML=col+thead+tbody;document.getElementById('totalText').textContent=`共 ${filtered.length} 条`}
-    function getFilteredRows(){const type=document.getElementById('ruleType')?.value||'全部';return rows.map((r,i)=>({r,i})).filter(({r})=>selectedRuleIds.has(r.id)&&selectedRuleNames.has(r.name)&&(type==='全部'||r.type===type))}
+    function getFilteredRows(){return rows.map((r,i)=>({r,i})).filter(({r})=>appliedRuleIds.has(r.id)&&appliedRuleNames.has(r.name)&&(appliedRuleType==='全部'||r.type===appliedRuleType))}
     function renderParam(p){const item=p||{name:'待配置',op:'—',value:'—',unit:'—'};return `<div class="param-item ${p?'':'empty'}"><span class="param-label" title="${esc(item.name)}">${esc(item.name)}：</span><span class="param-op">${esc(item.op)}</span><span class="param-value">${esc(item.value)}</span><span class="param-unit">${esc(item.unit)}</span></div>`}
     function renderParamEditor(p,rowIndex,paramIndex){const item=p||{name:'待配置',op:'—',value:'',unit:'—'};return `<div class="param-item editing"><span class="param-label" title="${esc(item.name)}">${esc(item.name)}：</span><span class="param-op">${esc(item.op)}</span><input class="param-input" id="param-${rowIndex}-${paramIndex}-value" value="${esc(item.value)}" placeholder="阈值"><span class="param-unit">${esc(item.unit)}</span></div>`}
     function renderRelation(r){const hasTwo=r.params.length>1&&r.params[1];const text=hasTwo?r.relation||'且':'—';return `<span class="relation-tag ${hasTwo?'':'empty'}">${esc(text)}</span>`}
@@ -56,10 +59,10 @@
     function renderRuleFilters(){renderRuleIdOptions();renderRuleNameOptions()}
     function getRuleNameOptions(){const kw=ruleNameKeyword.trim().toLowerCase();return rows.filter(r=>!kw||r.name.toLowerCase().includes(kw)||r.id.toLowerCase().includes(kw))}
     function updateRuleNameKeyword(v){ruleNameKeyword=v;renderRuleNameOptions();const input=document.getElementById('ruleNameSearch');input.focus();input.setSelectionRange(input.value.length,input.value.length)}
-    function toggleAllRuleIds(checked){selectedRuleIds=new Set(checked?rows.map(r=>r.id):[]);selectedRuleNames=new Set(rows.filter(r=>selectedRuleIds.has(r.id)).map(r=>r.name));renderRuleFilters();render()}
-    function toggleRuleId(id,checked){checked?selectedRuleIds.add(id):selectedRuleIds.delete(id);selectedRuleNames=new Set(rows.filter(r=>selectedRuleIds.has(r.id)).map(r=>r.name));renderRuleFilters();render()}
-    function toggleVisibleRuleNames(checked){getRuleNameOptions().forEach(r=>checked?selectedRuleNames.add(r.name):selectedRuleNames.delete(r.name));selectedRuleIds=new Set(rows.filter(r=>selectedRuleNames.has(r.name)).map(r=>r.id));renderRuleFilters();render()}
-    function toggleRuleName(name,checked){checked?selectedRuleNames.add(name):selectedRuleNames.delete(name);selectedRuleIds=new Set(rows.filter(r=>selectedRuleNames.has(r.name)).map(r=>r.id));renderRuleFilters();render()}
+    function toggleAllRuleIds(checked){selectedRuleIds=new Set(checked?rows.map(r=>r.id):[]);selectedRuleNames=new Set(rows.filter(r=>selectedRuleIds.has(r.id)).map(r=>r.name));renderRuleFilters()}
+    function toggleRuleId(id,checked){checked?selectedRuleIds.add(id):selectedRuleIds.delete(id);selectedRuleNames=new Set(rows.filter(r=>selectedRuleIds.has(r.id)).map(r=>r.name));renderRuleFilters()}
+    function toggleVisibleRuleNames(checked){getRuleNameOptions().forEach(r=>checked?selectedRuleNames.add(r.name):selectedRuleNames.delete(r.name));selectedRuleIds=new Set(rows.filter(r=>selectedRuleNames.has(r.name)).map(r=>r.id));renderRuleFilters()}
+    function toggleRuleName(name,checked){checked?selectedRuleNames.add(name):selectedRuleNames.delete(name);selectedRuleIds=new Set(rows.filter(r=>selectedRuleNames.has(r.name)).map(r=>r.id));renderRuleFilters()}
     function updateRuleSummaries(){const idN=selectedRuleIds.size;const nameN=selectedRuleNames.size;document.getElementById('ruleIdSummary').textContent=idN===rows.length?`已全选（${rows.length}）`:idN===0?'请选择规则ID':`已选择 ${idN} 个`;document.getElementById('ruleNameSummary').textContent=nameN===rows.length?`已全选（${rows.length}）`:nameN===0?'请选择规则名称':`已选择 ${nameN} 个`}
     function toggleDropdown(panelId,e){e.stopPropagation();document.querySelectorAll('.multi-panel').forEach(p=>{if(p.id!==panelId)p.classList.remove('show')});document.getElementById(panelId).classList.toggle('show')}
     function closeAllDropdowns(){document.querySelectorAll('.multi-panel').forEach(p=>p.classList.remove('show'))}
@@ -68,8 +71,8 @@
     function openForm(type){document.getElementById('mask').style.display='block';document.getElementById('formModal').style.display='block';document.getElementById('formTitle').textContent=(type==='add'?'新增':'编辑')+'规则配置';document.getElementById('formBody').innerHTML=`<div class="form-grid"><div class="form-item"><label><span class="required">*</span>规则ID</label><input class="input" value="C05"></div><div class="form-item"><label><span class="required">*</span>规则名称</label><input class="input" value="大额现金结算"></div><div class="form-item"><label>规则类型</label><select class="select"><option>合规</option><option>联动</option></select></div><div class="form-item span3"><label>场景</label><input class="input" value="审计监督-销售业务合规风险（规模以下）"></div><div class="form-item span3"><label>逻辑说明</label><textarea class="textarea">单笔订单现金支付金额≥5000元，或同一收银员日现金结算笔数占比＞30%。</textarea></div>${renderThresholdEditor()}</div>`}
     function closeAll(){document.getElementById('mask').style.display='none';document.querySelectorAll('.modal').forEach(m=>m.style.display='none')}
     function saveForm(){closeAll();showToast('保存成功，规则配置已更新')}
-    function queryData(){editingIndex=null;render();showToast('查询完成，已按规则ID和规则名称刷新')}
-    function resetQuery(){selectedRuleIds=new Set(rows.map(r=>r.id));selectedRuleNames=new Set(rows.map(r=>r.name));ruleNameKeyword='';editingIndex=null;document.getElementById('ruleType').selectedIndex=0;renderRuleFilters();render();showToast('查询条件已重置')}
+    function queryData(){appliedRuleIds=new Set(selectedRuleIds);appliedRuleNames=new Set(selectedRuleNames);appliedRuleType=document.getElementById('ruleType')?.value||'全部';editingIndex=null;render();showToast('查询完成，列表已按当前筛选条件刷新')}
+    function resetQuery(){selectedRuleIds=new Set(rows.map(r=>r.id));selectedRuleNames=new Set(rows.map(r=>r.name));appliedRuleIds=new Set(selectedRuleIds);appliedRuleNames=new Set(selectedRuleNames);appliedRuleType='全部';ruleNameKeyword='';editingIndex=null;document.getElementById('ruleType').selectedIndex=0;renderRuleFilters();render();showToast('查询条件已重置')}
     function openImport(){document.getElementById('mask').style.display='block';document.getElementById('importModal').style.display='block'}
     function openGuide(){document.getElementById('mask').style.display='block';document.getElementById('guideModal').style.display='block'}
     function simulateImport(){const p=document.getElementById('progress'),b=document.getElementById('progressBar');p.style.display='block';b.style.width='20%';setTimeout(()=>b.style.width='68%',260);setTimeout(()=>{b.style.width='100%';showToast('导入成功，校验通过')},720)}
@@ -80,7 +83,7 @@
     function esc(v){return String(v).replace(/[&<>"]/g,s=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[s]))}
     function escAttr(v){return esc(v).replace(/'/g,'&#39;')}
     document.addEventListener('click',e=>{if(!e.target.closest('.multi-select'))closeAllDropdowns()});
-    document.getElementById('ruleType').addEventListener('change',()=>{editingIndex=null;render()});
+    document.getElementById('ruleType').addEventListener('change',()=>{editingIndex=null});
     render();renderRuleFilters();
   </script>
 </body>
