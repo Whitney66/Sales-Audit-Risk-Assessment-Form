@@ -51,10 +51,7 @@
       {id:'C06',name:'退货频率异常（笔数）',type:'合规',store:stores[6],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'统计数据月份的总退货笔数≥统计数据月份倒退一年内的月平均退货笔数*1.25',riskLevel:'中高',relation:'',params:[{name:'比例',op:'≥',value:'25',unit:'%'}]},
       {id:'C07',name:'退货频率异常（金额）',type:'合规',store:stores[7],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'统计数据月份的总退货金额≥统计数据月份倒退一年内的月平均退货金额*1.05',riskLevel:'中高',relation:'',params:[{name:'比例',op:'≥',value:'5',unit:'%'}]},
       {id:'C08',name:'低于成本销售',type:'合规',store:stores[8],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'交易价格＜含税成本',riskLevel:'高',relation:'＜',fixedLogic:true,params:[{name:'交易价格',op:'字段',value:'交易价格',unit:''},{name:'含税成本',op:'字段',value:'含税成本',unit:''}]},
-      {id:'C09',name:'临时折扣超权限',type:'合规',store:stores[9],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'临时折扣/售价 大于等于 25%',riskLevel:'中高',relation:'',params:[{name:'折扣率',op:'≥',value:'25',unit:'%'}]},
-      {id:'C10',name:'提货（寄存）人与购买人不一致',type:'合规',store:stores[10],channel:'机场店、市内店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'提货人证件号 ≠ 订单购买人证件号',riskLevel:'—',relation:'',params:[{name:'预警条件',op:'=',value:'不一致',unit:''}]},
-      {id:'C11',name:'集中提货（寄存）',type:'合规',store:stores[0],channel:'机场店、市内店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'同一提货人1小时内提货订单数≥3笔（本日一小时）',riskLevel:'—',relation:'且',params:[{name:'订单数',op:'≥',value:'3',unit:'笔'},{name:'统计窗口',op:'≤',value:'1',unit:'小时'}]},
-      {id:'L01',name:'代购团伙识别',type:'联动',store:stores[5],channel:'机上店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'多个购买人证件≥3由同一支付账号付款，且提货集中在30分钟内由同一人签字提货',riskLevel:'—',relation:'且',params:[{name:'关联证件数',op:'≥',value:'3',unit:'个'},{name:'提货间隔',op:'≤',value:'30',unit:'分钟'}]}
+      {id:'C09',name:'临时折扣超权限',type:'合规',store:stores[9],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'临时折扣/售价 大于等于 25%',riskLevel:'中高',relation:'',params:[{name:'折扣率',op:'≥',value:'25',unit:'%'}]}
     ];
     let selectedRuleIds=new Set(rows.map(r=>r.id));
     let selectedRuleNames=new Set(rows.map(r=>r.name));
