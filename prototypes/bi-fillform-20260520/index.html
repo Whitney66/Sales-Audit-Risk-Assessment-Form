@@ -98,7 +98,6 @@
       document.getElementById('mask').style.display='block';
       document.getElementById('formModal').style.display='block';
       document.getElementById('formTitle').textContent=(isAdd?'新增':'编辑')+'规则配置';
-      const ruleOptions=rows.map((r,i)=>`<option value="${i}">${esc(r.id)} / ${esc(r.name)}</option>`).join('');
       const storeOptions=stores.map(s=>`<option>${esc(s)}</option>`).join('');
       const channelOptions=channels.map(c=>`<option>${esc(c)}</option>`).join('');
       function renderParamsEditor(p0,p1){
@@ -107,7 +106,6 @@
         return `<div class="form-item"><label>参数项1</label><input id="addParam0Name" class="input" value="${esc(a.name)}"></div><div class="form-item"><label>阈值</label><input id="addParam0Value" class="input" value="${esc(a.value)}"></div><div class="form-item"><label>单位</label><span class="param-unit" id="addParam0Unit">${esc(a.unit)}</span></div><div style="height:8px"></div><div class="form-item"><label>参数项2</label><input id="addParam1Name" class="input" value="${esc(b.name)}"></div><div class="form-item"><label>阈值</label><input id="addParam1Value" class="input" value="${esc(b.value)}"></div><div class="form-item"><label>单位</label><span class="param-unit" id="addParam1Unit">${esc(b.unit)}</span></div>`
       }
       document.getElementById('formBody').innerHTML=`<div class="form-grid">`+
-        `<div class="form-item"><label>选择规则</label><select id="addRuleSelector" class="select"><option value="">-- 选择已有规则 --</option>${ruleOptions}</select></div>`+
         `<div class="form-item"><label><span class="required">*</span>规则ID</label><input id="addRuleId" class="input" value=""></div>`+
         `<div class="form-item"><label><span class="required">*</span>规则名称</label><input id="addRuleName" class="input" value=""></div>`+
         `<div class="form-item"><label>规则类型</label><select id="addRuleType" class="select"><option>合规</option><option>联动</option></select></div>`+
@@ -118,28 +116,6 @@
         `<div class="form-item"><label>风险等级</label><select id="addRiskLevel" class="select"><option>高</option><option>中高</option><option>中</option><option>中低</option><option>低</option></select></div>`+
         `${renderParamsEditor()}`+
       `</div>`;
-      document.getElementById('addRuleSelector').addEventListener('change',e=>{
-        const idx=e.target.value;
-        if(idx!==''){
-          const r=rows[Number(idx)];
-          document.getElementById('addRuleId').value=r.id||'';
-          document.getElementById('addRuleName').value=r.name||'';
-          document.getElementById('addRuleType').value=r.type||'合规';
-          document.getElementById('addStore').value=r.store||stores[0];
-          document.getElementById('addChannel').value=r.channel||channels[0];
-          document.getElementById('addScene').value=r.scene||'';
-          document.getElementById('addLogic').value=r.logic||'';
-          document.getElementById('addRiskLevel').value=r.riskLevel||'';
-          const p0=r.params[0]||{name:'待配置',value:'',unit:''};
-          const p1=r.params[1]||{name:'待配置',value:'',unit:''};
-          document.getElementById('addParam0Name').value=p0.name||'';
-          document.getElementById('addParam0Value').value=p0.value||'';
-          document.getElementById('addParam0Unit').textContent=p0.unit||'';
-          document.getElementById('addParam1Name').value=p1.name||'';
-          document.getElementById('addParam1Value').value=p1.value||'';
-          document.getElementById('addParam1Unit').textContent=p1.unit||'';
-        }
-      })
     }
     function closeAll(){document.getElementById('mask').style.display='none';document.querySelectorAll('.modal').forEach(m=>m.style.display='none')}
     function saveForm(){closeAll();showToast('保存成功，规则配置已更新')}
