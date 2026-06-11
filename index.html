@@ -43,7 +43,7 @@
     ];
     const channels=['外供店','边境店','机上店','机场店','市内店'];
     const rows=[
-      {id:'C01',name:'同一证件高频购买',type:'合规',store:stores[0],channel:'边境店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'同一证件号购买相同商品编码次数≥3次/30天，或单日订单数≥5笔',riskLevel:'中',relation:'或',params:[{name:'购买次数',op:'≥',value:'3',unit:'次/30天'},{name:'单日订单数',op:'≥',value:'5',unit:'笔'}]},
+      {id:'C01',name:'同一证件高频购买',type:'合规',store:stores[0],channel:'边境店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'同一证件号购买相同商品编码次数≥3次/月，或单日订单数≥5笔',riskLevel:'中',relation:'或',params:[{name:'购买次数',op:'≥',value:'3',unit:'次/月'},{name:'单日订单数',op:'≥',value:'5',unit:'笔'}]},
       {id:'C02',name:'护照、身份信息相同，顾客姓名不同',type:'合规',store:stores[1],channel:'边境店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'同一护照身份信息存在不同顾客姓名，≥2笔',riskLevel:'中低',relation:'',params:[{name:'笔数',op:'≥',value:'2',unit:'笔'}]},
       {id:'C03',name:'购买时间异常',type:'合规',store:stores[2],channel:'市内店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'两笔订单间隔购买时间≥6小时且≤48小时',riskLevel:'高',relation:'且',params:[{name:'最小间隔时间',op:'≥',value:'6',unit:'小时'},{name:'最大间隔时间',op:'≤',value:'48',unit:'小时'}]},
       {id:'C04',name:'支付人与证件人不一致',type:'合规',store:stores[3],channel:'机场店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'同一支付账号为≥3个不同证件号的订单付款',riskLevel:'高',relation:'',params:[{name:'证件数',op:'≥',value:'3',unit:'个'}]},
@@ -96,7 +96,54 @@
     function closeAllDropdowns(){document.querySelectorAll('.multi-panel').forEach(p=>p.classList.remove('show'))}
 
     function renderThresholdEditor(){const row=rows[4];const params=[row.params[0],row.params[1]];return `<div class="threshold-panel"><div class="threshold-title">参数项配置</div><div class="threshold-grid">${params.map((p,i)=>`<div class="threshold-item"><span class="threshold-label">参数项${i+1}</span><input class="input" value="${esc(p.name)}"><select class="param-select"><option>${esc(p.op)}</option><option>请选择</option><option>≥</option><option>≤</option><option>＞</option><option>＜</option><option>=</option></select><input class="param-input" value="${esc(p.value)}"><span class="param-unit">${esc(p.unit)}</span></div>`).join('')}</div><div class="form-item" style="margin-top:14px;width:220px"><label>关联关系</label><select class="select"><option>${esc(row.relation||'且')}</option><option>且</option><option>或</option></select></div></div>`}
-    function openForm(type){document.getElementById('mask').style.display='block';document.getElementById('formModal').style.display='block';document.getElementById('formTitle').textContent=(type==='add'?'新增':'编辑')+'规则配置';document.getElementById('formBody').innerHTML=`<div class="form-grid"><div class="form-item"><label><span class="required">*</span>规则ID</label><input class="input" value="C05"></div><div class="form-item"><label><span class="required">*</span>规则名称</label><input class="input" value="大额现金结算"></div><div class="form-item"><label>规则类型</label><select class="select"><option>合规</option><option>联动</option></select></div><div class="form-item"><label>门店</label><select class="select">${stores.map(s=>`<option ${s===rows[4].store?'selected':''}>${esc(s)}</option>`).join('')}</select></div><div class="form-item"><label>渠道</label><select class="select">${channels.map(c=>`<option ${c===rows[4].channel?'selected':''}>${esc(c)}</option>`).join('')}</select></div><div class="form-item span3"><label>场景</label><input class="input" value="审计监督-销售业务合规风险（规模以下）"></div><div class="form-item span3"><label>逻辑说明</label><textarea class="textarea">单笔订单现金支付金额≥5000元，或同一收银员日现金结算笔数占比＞30%。</textarea></div>${renderThresholdEditor()}</div>`}
+    function openForm(type){
+      const isAdd=type==='add';
+      document.getElementById('mask').style.display='block';
+      document.getElementById('formModal').style.display='block';
+      document.getElementById('formTitle').textContent=(isAdd?'新增':'编辑')+'规则配置';
+      const ruleOptions=rows.map((r,i)=>`<option value="${i}">${esc(r.id)} / ${esc(r.name)}</option>`).join('');
+      const storeOptions=stores.map(s=>`<option>${esc(s)}</option>`).join('');
+      const channelOptions=channels.map(c=>`<option>${esc(c)}</option>`).join('');
+      function renderParamsEditor(p0,p1){
+        const a=p0||{name:'待配置',value:'',unit:''};
+        const b=p1||{name:'待配置',value:'',unit:''};
+        return `<div class="form-item"><label>参数项1</label><input id="addParam0Name" class="input" value="${esc(a.name)}"></div><div class="form-item"><label>阈值</label><input id="addParam0Value" class="input" value="${esc(a.value)}"></div><div class="form-item"><label>单位</label><span class="param-unit" id="addParam0Unit">${esc(a.unit)}</span></div><div style="height:8px"></div><div class="form-item"><label>参数项2</label><input id="addParam1Name" class="input" value="${esc(b.name)}"></div><div class="form-item"><label>阈值</label><input id="addParam1Value" class="input" value="${esc(b.value)}"></div><div class="form-item"><label>单位</label><span class="param-unit" id="addParam1Unit">${esc(b.unit)}</span></div>`
+      }
+      document.getElementById('formBody').innerHTML=`<div class="form-grid">`+
+        `<div class="form-item"><label>选择规则</label><select id="addRuleSelector" class="select"><option value="">-- 选择已有规则 --</option>${ruleOptions}</select></div>`+
+        `<div class="form-item"><label><span class="required">*</span>规则ID</label><input id="addRuleId" class="input" value=""></div>`+
+        `<div class="form-item"><label><span class="required">*</span>规则名称</label><input id="addRuleName" class="input" value=""></div>`+
+        `<div class="form-item"><label>规则类型</label><select id="addRuleType" class="select"><option>合规</option><option>联动</option></select></div>`+
+        `<div class="form-item"><label>门店</label><select id="addStore" class="select">${storeOptions}</select></div>`+
+        `<div class="form-item"><label>渠道</label><select id="addChannel" class="select">${channelOptions}</select></div>`+
+        `<div class="form-item span3"><label>场景</label><input id="addScene" class="input" value=""></div>`+
+        `<div class="form-item span3"><label>逻辑说明</label><textarea id="addLogic" class="textarea"></textarea></div>`+
+        `<div class="form-item"><label>风险等级</label><select id="addRiskLevel" class="select"><option>高</option><option>中高</option><option>中</option><option>中低</option><option>低</option></select></div>`+
+        `${renderParamsEditor()}`+
+      `</div>`;
+      document.getElementById('addRuleSelector').addEventListener('change',e=>{
+        const idx=e.target.value;
+        if(idx!==''){
+          const r=rows[Number(idx)];
+          document.getElementById('addRuleId').value=r.id||'';
+          document.getElementById('addRuleName').value=r.name||'';
+          document.getElementById('addRuleType').value=r.type||'合规';
+          document.getElementById('addStore').value=r.store||stores[0];
+          document.getElementById('addChannel').value=r.channel||channels[0];
+          document.getElementById('addScene').value=r.scene||'';
+          document.getElementById('addLogic').value=r.logic||'';
+          document.getElementById('addRiskLevel').value=r.riskLevel||'';
+          const p0=r.params[0]||{name:'待配置',value:'',unit:''};
+          const p1=r.params[1]||{name:'待配置',value:'',unit:''};
+          document.getElementById('addParam0Name').value=p0.name||'';
+          document.getElementById('addParam0Value').value=p0.value||'';
+          document.getElementById('addParam0Unit').textContent=p0.unit||'';
+          document.getElementById('addParam1Name').value=p1.name||'';
+          document.getElementById('addParam1Value').value=p1.value||'';
+          document.getElementById('addParam1Unit').textContent=p1.unit||'';
+        }
+      })
+    }
     function closeAll(){document.getElementById('mask').style.display='none';document.querySelectorAll('.modal').forEach(m=>m.style.display='none')}
     function saveForm(){closeAll();showToast('保存成功，规则配置已更新')}
     function queryData(){appliedRuleIds=new Set(selectedRuleIds);appliedRuleNames=new Set(selectedRuleNames);appliedStores=new Set(selectedStores);appliedChannels=new Set(selectedChannels);appliedRuleType=document.getElementById('ruleType')?.value||'全部';editingIndex=null;render();showToast('查询完成，列表已按当前筛选条件刷新')}
