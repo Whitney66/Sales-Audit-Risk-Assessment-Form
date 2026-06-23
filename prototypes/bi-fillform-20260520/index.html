@@ -104,7 +104,7 @@
       const storeOptions=stores.map(s=>`<option>${esc(s)}</option>`).join('');
       const channelOptions=['全部',...channels].map(c=>`<option>${esc(c)}</option>`).join('');
       const ruleIdOptions=rows.map(r=>`<option>${esc(r.id)}</option>`).join('');
-      const comparatorOptions=['大于','大于等于','等于','小于等于','小于'];
+      const comparatorOptions=['＞','≥','=','≤','＜'];
       const unitOptions=['次/月','笔','小时','个','元','%'];
       const relationOptions=['-','且'];
       const note=(text,extra='')=>`<div class="field-note"><strong>校验规则：</strong>${text}${extra?`<br/><strong>说明：</strong>${extra}`:''}</div>`;
@@ -112,7 +112,7 @@
       function renderParamBlock(index){
         return `<div class="form-section"><div class="form-section-title">参数项${index}</div><div class="param-section">`+
           `<div class="form-item"><label>参数项${index}-名称</label><input id="addParam${index}Name" class="input" value="">${note('填写，不做校验')}</div>`+
-          `<div class="form-item"><label>参数项${index}-运算符</label><select id="addParam${index}Op" class="select">${renderSelectOptions(comparatorOptions)}</select>${note('下拉单选：大于、大于等于、等于、小于等于、小于')}</div>`+
+          `<div class="form-item"><label>参数项${index}-运算符</label><select id="addParam${index}Op" class="select">${renderSelectOptions(comparatorOptions)}</select>${note('下拉单选：＞、≥、=、≤、＜')}</div>`+
           `<div class="form-item"><label>参数项${index}-值</label><input id="addParam${index}Value" class="input" value="">${note('填写，不做校验')}</div>`+
           `<div class="form-item"><label>参数项${index}-单位</label><select id="addParam${index}Unit" class="select">${renderSelectOptions(unitOptions)}</select>${note('下拉单选：次/月、笔、小时、个、元、%')}</div>`+
         `</div></div>`
@@ -125,11 +125,11 @@
         `<div class="form-item"><label>规则类型</label><select id="addRuleType" class="select"><option>合规</option><option>联动</option></select>${note('下拉单选，枚举值：合规、联动')}</div>`+
         `<div class="form-item"><label>订单类别</label><select id="addOrderType" class="select"><option>全部</option><option>销售</option><option>退货</option></select>${note('下拉单选，枚举值：全部、销售、退货')}</div>`+
         `<div class="form-item span2"><label>场景</label><input id="addScene" class="input" value="">${note('填写，不做校验')}</div>`+
+        `<div class="form-item"><label>风险等级</label><select id="addRiskLevel" class="select"><option>高</option><option>中高</option><option>中</option><option>中低</option><option>低</option></select>${note('下拉单选，枚举值：高、中高、中、中低、低')}</div>`+
         `${renderParamBlock(1)}`+
         `<div class="form-item"><label>关联关系</label><select id="addRelation" class="select">${renderSelectOptions(relationOptions)}</select>${note('填写内容仅为“-”或“且”，不填则展示为“-”','原型中以单选下拉呈现，默认值为“-”')}</div>`+
         `${renderParamBlock(2)}`+
         `<div class="form-item span2"><label>逻辑说明</label><textarea id="addLogic" class="textarea"></textarea>${note('填写，不做校验')}</div>`+
-        `<div class="form-item"><label>风险等级</label><select id="addRiskLevel" class="select"><option>高</option><option>中高</option><option>中</option><option>中低</option><option>低</option></select>${note('下拉单选，枚举值：高、中高、中、中低、低')}</div>`+
       `</div>`;
     }
     function closeAll(){document.getElementById('mask').style.display='none';document.querySelectorAll('.modal').forEach(m=>m.style.display='none')}
