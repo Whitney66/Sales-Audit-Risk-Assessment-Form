@@ -106,7 +106,6 @@
       const ruleIdOptions=rows.map(r=>`<option>${esc(r.id)}</option>`).join('');
       const comparatorOptions=['＞','≥','=','≤','＜'];
       const unitOptions=['次/月','笔','小时','个','元','%'];
-      const relationOptions=['-','且'];
       const note=(text,extra='')=>`<div class="field-note"><strong>校验规则：</strong>${text}${extra?`<br/><strong>说明：</strong>${extra}`:''}</div>`;
       function renderSelectOptions(options){return options.map(option=>`<option>${esc(option)}</option>`).join('')}
       function renderParamBlock(index){
@@ -127,7 +126,7 @@
         `<div class="form-item span2"><label>场景</label><input id="addScene" class="input" value="">${note('填写，不做校验')}</div>`+
         `<div class="form-item"><label>风险等级</label><select id="addRiskLevel" class="select"><option>高</option><option>中高</option><option>中</option><option>中低</option><option>低</option></select>${note('下拉单选，枚举值：高、中高、中、中低、低')}</div>`+
         `${renderParamBlock(1)}`+
-        `<div class="form-item"><label>关联关系</label><select id="addRelation" class="select">${renderSelectOptions(relationOptions)}</select>${note('填写内容仅为“-”或“且”，不填则展示为“-”','原型中以单选下拉呈现，默认值为“-”')}</div>`+
+        `<div class="form-item"><label>关联关系</label><input id="addRelation" class="input" value="" placeholder="可填写 - 或 且">${note('填写内容仅为“-”或“且”，允许不填；不填则展示为“-”')}</div>`+
         `${renderParamBlock(2)}`+
         `<div class="form-item span2"><label>逻辑说明</label><textarea id="addLogic" class="textarea"></textarea>${note('填写，不做校验')}</div>`+
       `</div>`;
