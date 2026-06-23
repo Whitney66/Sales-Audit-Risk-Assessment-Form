@@ -42,17 +42,19 @@
       '[6853]上海港中免免税品有限公司'
     ];
     const channels=['外供店','边境店','机上店','机场店','市内店'];
-    const orderTypeMap={'C01':'销售','C02':'全部','C03':'全部','C04':'全部','C05':'销售','C06':'退货','C07':'退货','C08':'销售','C09':'销售'};
+    const orderTypeMap={'C01-1':'销售','C01-2':'销售','C02':'全部','C03':'全部','C04':'全部','C05-1':'销售','C05-2':'销售','C06':'退货','C07':'退货','C08':'销售','C09':'销售'};
     const rows=[
-      {id:'C01',name:'同一证件高频购买',type:'合规',orderType:'销售',store:stores[0],channel:'边境店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'同一证件号购买相同商品编码次数≥3次/月，或单日订单数≥5笔',riskLevel:'中',relation:'或',params:[{name:'购买次数',op:'≥',value:'3',unit:'次/月'},{name:'单日订单数',op:'≥',value:'5',unit:'笔'}]},
-      {id:'C02',name:'护照、身份信息相同，顾客姓名不同',type:'合规',orderType:'全部',store:stores[1],channel:'边境店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'同一护照身份信息存在不同顾客姓名，≥2笔',riskLevel:'中低',relation:'',params:[{name:'笔数',op:'≥',value:'2',unit:'笔'}]},
-      {id:'C03',name:'购买时间异常',type:'合规',orderType:'全部',store:stores[2],channel:'市内店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'两笔订单间隔购买时间≥6小时且≤48小时',riskLevel:'高',relation:'且',params:[{name:'最小间隔时间',op:'≥',value:'6',unit:'小时'},{name:'最大间隔时间',op:'≤',value:'48',unit:'小时'}]},
-      {id:'C04',name:'支付人与证件人不一致',type:'合规',orderType:'全部',store:stores[3],channel:'机场店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'同一支付账号为≥3个不同证件号的订单付款',riskLevel:'高',relation:'',params:[{name:'证件数',op:'≥',value:'3',unit:'个'}]},
-      {id:'C05',name:'大额现金结算',type:'合规',orderType:'销售',store:stores[4],channel:'外供店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'单笔订单现金支付金额≥5000元，或同一收银员日现金结算笔数占比＞30%',riskLevel:'中高',relation:'或',params:[{name:'单笔现金金额',op:'≥',value:'5000',unit:'元'},{name:'现金结算笔数占比',op:'＞',value:'30',unit:'%'}]},
-      {id:'C06',name:'退货频率异常（笔数）',type:'合规',orderType:'退货',store:stores[6],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'统计数据月份的总退货笔数≥统计数据月份倒退一年内的月平均退货笔数*1.25',riskLevel:'中高',relation:'',params:[{name:'比例',op:'≥',value:'25',unit:'%'}]},
-      {id:'C07',name:'退货频率异常（金额）',type:'合规',orderType:'退货',store:stores[7],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'统计数据月份的总退货金额≥统计数据月份倒退一年内的月平均退货金额*1.05',riskLevel:'中高',relation:'',params:[{name:'比例',op:'≥',value:'5',unit:'%'}]},
-      {id:'C08',name:'低于成本销售',type:'合规',orderType:'销售',store:stores[8],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'成交金额＜含税成本',riskLevel:'高',relation:'-',fixedLogic:true,params:[{name:'成交金额＜含税成本',op:'',value:'',unit:''}]},
-      {id:'C09',name:'临时折扣超权限',type:'合规',orderType:'销售',store:stores[9],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'临时折扣/售价 大于等于 25%',riskLevel:'中高',relation:'',params:[{name:'折扣率',op:'≥',value:'25',unit:'%'}]}
+      {id:'C01-1',name:'同一证件高频购买（/月）',type:'合规',orderType:'销售',store:stores[0],channel:'边境店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'同一证件号码买相同商品编码次数≥3次/月',riskLevel:'中',relation:'-',params:[{name:'购买次数',op:'≥',value:'3',unit:'次/月'}]},
+      {id:'C01-2',name:'同一证件高频购买',type:'合规',orderType:'销售',store:stores[0],channel:'边境店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'单日订单数≥5笔',riskLevel:'中',relation:'-',params:[{name:'单日订单数',op:'≥',value:'5',unit:'笔'}]},
+      {id:'C02',name:'护照、身份信息相同，顾客姓名不同',type:'合规',orderType:'全部',store:stores[1],channel:'边境店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'所选时间窗口内，同一证件身份信息存在不同顾客姓名≥2笔',riskLevel:'中低',relation:'-',params:[{name:'顾客姓名',op:'=',value:'2',unit:'个'}]},
+      {id:'C03',name:'购买时间异常',type:'合规',orderType:'全部',store:stores[2],channel:'市内店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'同一旅客连续两笔订单间隔购买时间≥6小时且≤48小时',riskLevel:'高',relation:'且',params:[{name:'最小间隔时间',op:'≥',value:'6',unit:'小时'},{name:'最大间隔时间',op:'≤',value:'48',unit:'小时'}]},
+      {id:'C04',name:'支付人与证件人不一致',type:'合规',orderType:'全部',store:stores[3],channel:'机场店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'在所选时间窗口内同一交易卡号为≥3个不同“证件号+顾客姓名”的订单付款',riskLevel:'高',relation:'且',params:[{name:'证件号数',op:'≥',value:'3',unit:'个'},{name:'顾客姓名',op:'≥',value:'3',unit:'个'}]},
+      {id:'C05-1',name:'大额现金结算-单笔金额',type:'合规',orderType:'销售',store:stores[4],channel:'外供店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'单笔订单现金支付金额≥5000元',riskLevel:'中高',relation:'-',params:[{name:'单笔金额',op:'≥',value:'5000',unit:'元'}]},
+      {id:'C05-2',name:'大额现金结算-现金笔数占比',type:'合规',orderType:'销售',store:stores[4],channel:'外供店',scene:'审计监督-销售业务合规风险（规模以下）',logic:'同一收银员日现金结算笔数占比＞30%',riskLevel:'中高',relation:'-',params:[{name:'现金笔数占比',op:'≥',value:'30',unit:'%'}]},
+      {id:'C06',name:'退货频率异常（笔数）',type:'合规',orderType:'退货',store:stores[6],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'统计数据月份的总退货笔数超过12个完整自然月内的月平均退货笔数1.25',riskLevel:'中高',relation:'-',params:[{name:'比例',op:'=',value:'25',unit:'%'}]},
+      {id:'C07',name:'退货频率异常（金额）',type:'合规',orderType:'退货',store:stores[7],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'统计数据月份的总退货金额超过12个完整自然月内的月平均退货金额1.05',riskLevel:'中高',relation:'-',params:[{name:'比例',op:'=',value:'5',unit:'%'}]},
+      {id:'C08',name:'低于成本销售',type:'合规',orderType:'销售',store:stores[8],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'成交金额＜含税成本',riskLevel:'高',relation:'-',params:[{name:'成交金额',op:'＜',value:'含税成本',unit:''}]},
+      {id:'C09',name:'临时折扣超权限',type:'合规',orderType:'销售',store:stores[9],channel:'全部',scene:'审计监督-销售业务合规风险（规模以下）',logic:'临时折扣/售价 大于等于 25%',riskLevel:'中高',relation:'-',params:[{name:'临时折扣额占比',op:'≥',value:'25',unit:'%'}]}
     ];
     const ruleKey=r=>`${r.id}__${r.name}`;
     let selectedRules=new Set(rows.map(ruleKey));
@@ -72,9 +74,9 @@
     function renderParam(p){const item=p||{name:'待配置',op:'—',value:'—',unit:'—'};return `<div class="param-item ${p?'':'empty'}"><span class="param-label" title="${esc(item.name)}">${esc(item.name)}：</span><span class="param-op">${esc(item.op)}</span><span class="param-value">${esc(item.value)}</span><span class="param-unit">${esc(item.unit)}</span></div>`}
     function renderFixedParam(text){return `<div class="param-item single"><span class="param-label" title="${esc(text)}">${esc(text)}</span></div>`}
     function renderEmptyParam(text='—'){return `<div class="param-item empty single"><span class="param-label" title="${esc(text)}">${esc(text)}</span></div>`}
-    function renderParamCell(r,rowIndex,paramIndex){if(r.fixedLogic){return paramIndex===0?renderFixedParam(r.params[0]?.name||r.logic):renderEmptyParam('-')}const param=r.params[paramIndex];return editingIndex===rowIndex&&param&&!r.fixedLogic?renderParamEditor(param,rowIndex,paramIndex):renderParam(param)}
+    function renderParamCell(r,rowIndex,paramIndex){const param=r.params[paramIndex];return editingIndex===rowIndex&&param&&!r.fixedLogic?renderParamEditor(param,rowIndex,paramIndex):renderParam(param)}
     function renderParamEditor(p,rowIndex,paramIndex){const item=p||{name:'待配置',op:'—',value:'',unit:'—'};return `<div class="param-item editing"><span class="param-label" title="${esc(item.name)}">${esc(item.name)}：</span><span class="param-op">${esc(item.op)}</span><input class="param-input" id="param-${rowIndex}-${paramIndex}-value" value="${esc(item.value)}" placeholder="阈值"><span class="param-unit">${esc(item.unit)}</span></div>`}
-    function renderRelation(r){if(r.fixedLogic)return `<span class="relation-tag empty">-</span>`;const hasTwo=r.params.length>1&&r.params[1];const text=hasTwo?r.relation||'且':'—';return `<span class="relation-tag ${hasTwo?'':'empty'}">${esc(text)}</span>`}
+    function renderRelation(r){const hasTwo=r.params.length>1&&r.params[1];const text=hasTwo?(r.relation||'且'):'-';return `<span class="relation-tag ${hasTwo?'':'empty'}">${esc(text)}</span>`}
     function editRow(rowIndex){editingIndex=rowIndex;render();showToast('当前行阈值配置已切换为可编辑状态')}
     function saveRow(rowIndex){if(!rows[rowIndex].fixedLogic){rows[rowIndex].params=rows[rowIndex].params.map((p,i)=>({...p,value:document.getElementById(`param-${rowIndex}-${i}-value`)?.value.trim()||p.value}))}editingIndex=null;render();showToast(rows[rowIndex].fixedLogic?'固定逻辑无需维护阈值':'保存成功，阈值已更新，其余内容保持不变')}
     function cancelEdit(){editingIndex=null;render();showToast('已取消编辑')}
